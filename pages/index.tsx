@@ -12,7 +12,7 @@ export default function Home() {
 
       <main>
         <Heading as="h1">Jobs Quest</Heading>
-        <Link href="/auth/sign-in" as={NextLink} color="teal.500">
+        <Link href="/auth/sign-in" as={NextLink}>
           <a>Login</a>
         </Link>
       </main>
