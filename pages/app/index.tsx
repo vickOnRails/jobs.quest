@@ -1,10 +1,13 @@
 import React from "react";
-import { Button, Avatar } from "@chakra-ui/react";
+import { Button, Avatar, useColorMode } from "@chakra-ui/react";
 import { signOut, getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
+import { Moon, Sun } from "react-feather";
 import { DefaultUser, Session } from "next-auth";
 
 const Index = ({ session }: { session: Session }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
+
   const { user } = session;
   const { image, name } = user as DefaultUser;
 
@@ -13,7 +16,9 @@ const Index = ({ session }: { session: Session }) => {
       <p>Welcome {name}</p>
 
       {image && <Avatar src={image} />}
-
+      <Button onClick={toggleColorMode}>
+        {colorMode === "light" ? <Moon /> : <Sun />}
+      </Button>
       <Button onClick={() => signOut()}>Sign Out</Button>
     </div>
   );
