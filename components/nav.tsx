@@ -40,11 +40,7 @@ export const Nav = () => {
           <MoreVertical />
         </Button>
 
-        <Button
-          onClick={toggleColorMode}
-          variant="outline"
-          className="hide-mobile"
-        >
+        <Button onClick={toggleColorMode} variant="outline">
           {colorMode === "light" ? <Moon /> : <Sun />}
         </Button>
 

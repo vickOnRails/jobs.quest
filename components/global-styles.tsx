@@ -10,7 +10,8 @@ export const GlobalStyles = () => (
         --chakra-fonts-heading: "space grotesk", -apple-system,
           BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
           Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-        --breakpoints-tab: 759px;
+
+        --br-lg: 12px;
         padding: 0;
         margin: 0;
         font-family: var(--chakra-fonts-heading);
