@@ -9,7 +9,7 @@ export const Layout: FC<LayoutProps> = ({ children, ...props }) => {
   return (
     <div {...props}>
       <Nav />
-      {children}
+      <main>{children}</main>
     </div>
   );
 };

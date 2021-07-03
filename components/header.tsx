@@ -1,5 +1,12 @@
 import React, { FC, HTMLAttributes } from "react";
-import { Avatar, Heading, Flex, Spacer } from "@chakra-ui/react";
+import {
+  Avatar,
+  Heading,
+  Flex,
+  Spacer,
+  useColorMode,
+  Box,
+} from "@chakra-ui/react";
 import styled from "@emotion/styled";
 
 import { Container } from ".";
@@ -10,15 +17,21 @@ import { breakpoints } from "../theme";
  *  Header component
  */
 export const Header: FC<HeaderProps> = ({ user }) => {
+  const { colorMode } = useColorMode();
   const { image, name } = user;
+
   return (
-    <StyledHeader className="header">
+    <StyledHeader
+      className="header"
+      as="header"
+      bg={colorMode === "dark" ? "gray.900" : "gray.100"}
+    >
       <Flex as={Container} alignItems="center">
         {image && <Avatar src={image} className="header__avatar" />}
 
         <Heading as="h1">{name}</Heading>
 
-        <div className="header__illustration" />
+        {colorMode === "light" && <div className="header__illustration" />}
       </Flex>
     </StyledHeader>
   );
@@ -31,8 +44,7 @@ interface HeaderProps extends HTMLAttributes<HTMLElement> {
   user: DefaultUser;
 }
 
-const StyledHeader = styled.header`
-  background: #f5f5f5;
+const StyledHeader = styled(Box)`
   min-height: 8em;
   display: flex;
 
