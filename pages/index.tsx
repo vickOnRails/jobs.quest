@@ -24,8 +24,11 @@ import { Container } from "../components";
 import { breakpoints } from "../theme";
 import { Session } from "next-auth";
 
+/**
+ * Home component - the main page of the app.
+ */
+
 export default function Home({
-  session,
   providers,
 }: {
   session: Session;
@@ -90,6 +93,7 @@ export default function Home({
               </UnorderedList>
             </div>
 
+            {/* loop through all registered providers on Next-Auth */}
             <div>
               <ButtonGroup spacing={2}>
                 {Object.values(providers).map((provider: any) => {
@@ -125,8 +129,9 @@ export default function Home({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { res, req } = context;
+  const { req } = context;
 
+  // obtain user session
   const session = await getSession({ req });
 
   // redirect to app if user is already signed in

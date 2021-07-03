@@ -5,6 +5,9 @@ import { AppProps } from "next/dist/next-server/lib/router/router";
 import { GlobalStyles } from "../components";
 import theme from "../theme";
 
+/**
+ * Wrap app in NextAuth & Chakra providers
+ */
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>

@@ -1,6 +1,9 @@
 import NextAuth from "next-auth";
 import Providers from "next-auth/providers";
 
+// setup NextAuth provider for just Github for now
+// TODO: add more providers
+
 const options = {
   providers: [
     Providers.GitHub({
@@ -8,9 +11,6 @@ const options = {
       clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
-  pages: {
-    signIn: "/sign-in",
-  },
 };
 
 export default (req, res) => NextAuth(req, res, options);

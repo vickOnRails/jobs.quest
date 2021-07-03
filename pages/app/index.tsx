@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   const { req } = client;
   const session = await getSession({ req });
 
-  // Redirect to sign-in if user is not authenticated
+  // Redirect to root page if user is not authenticated
   if (!session) {
     return {
       redirect: {
