@@ -1,17 +1,37 @@
 import React, { FC, HTMLAttributes } from "react";
+import styled from "@emotion/styled";
 
-import { Nav } from ".";
+import { Nav, Header } from ".";
+import { DefaultUser } from "next-auth";
 
 /**
  *  Layout component to wrap all pages
  */
-export const Layout: FC<LayoutProps> = ({ children, ...props }) => {
+export const Layout: FC<LayoutProps> = ({
+  children,
+  user,
+  showHeader,
+  ...props
+}) => {
   return (
-    <div {...props}>
+    <StyledLayout {...props}>
       <Nav />
-      <main>{children}</main>
-    </div>
+      {showHeader && <Header user={user} />}
+      <main className="main">{children}</main>
+    </StyledLayout>
   );
 };
 
-interface LayoutProps extends HTMLAttributes<HTMLDivElement> {}
+const StyledLayout = styled.div``;
+
+interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * user - user from NextAuth return object
+   */
+  user: DefaultUser;
+
+  /**
+   * showHeader - should header component be shown
+   */
+  showHeader?: boolean;
+}

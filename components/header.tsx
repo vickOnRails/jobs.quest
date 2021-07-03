@@ -47,6 +47,7 @@ interface HeaderProps extends HTMLAttributes<HTMLElement> {
 const StyledHeader = styled(Box)`
   min-height: 8em;
   display: flex;
+  margin-bottom: 1em;
 
   .container {
     position: relative;
