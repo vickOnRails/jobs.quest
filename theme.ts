@@ -3,8 +3,14 @@ import { extendTheme, ThemeConfig } from "@chakra-ui/react";
 
 // 2. Add your color mode config
 const config: ThemeConfig = {
-  initialColorMode: "dark",
-  useSystemColorMode: true,
+  initialColorMode: "light",
+  useSystemColorMode: false,
+};
+
+export const breakpoints = {
+  sm: "768px",
+  md: "1024px",
+  lg: "1334px",
 };
 
 // 3. extend the theme

@@ -5,6 +5,8 @@ import { GetServerSideProps } from "next";
 import { Moon, Sun } from "react-feather";
 import { DefaultUser, Session } from "next-auth";
 
+import { Container } from "../../components";
+
 const Index = ({ session }: { session: Session }) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
@@ -12,7 +14,7 @@ const Index = ({ session }: { session: Session }) => {
   const { image, name } = user as DefaultUser;
 
   return (
-    <div>
+    <Container>
       <p>Welcome {name}</p>
 
       {image && <Avatar src={image} />}
@@ -20,7 +22,7 @@ const Index = ({ session }: { session: Session }) => {
         {colorMode === "light" ? <Moon /> : <Sun />}
       </Button>
       <Button onClick={() => signOut()}>Sign Out</Button>
-    </div>
+    </Container>
   );
 };
 
@@ -32,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   if (!session) {
     return {
       redirect: {
-        destination: "/auth/sign-in",
+        destination: "/",
         permanent: false,
       },
     };
