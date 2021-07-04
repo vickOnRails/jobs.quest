@@ -53,7 +53,7 @@ const Index = ({
 }) => {
   const { user } = session;
 
-  if (error) return <p>Error</p>;
+  if (error) return <p>{error}</p>;
 
   const jobsLookup = jobBoards.map((board) => board.name);
 
