@@ -11,7 +11,7 @@ export const Boards: FC<BoardsProps> = ({ boards }) => {
   return (
     <StyledBoard>
       {boards.map((board) => (
-        <Board board={board} />
+        <Board key={board.name} board={board} />
       ))}
     </StyledBoard>
   );

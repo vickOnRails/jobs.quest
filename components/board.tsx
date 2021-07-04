@@ -10,6 +10,13 @@ export interface Job {
   location: string;
   date: number;
   companyName: string;
+  stage:
+    | "saved"
+    | "preparing"
+    | "applied"
+    | "interviewing"
+    | "accepted"
+    | "rejected";
 }
 
 /**
@@ -37,7 +44,7 @@ interface BoardProps extends HTMLAttributes<HTMLElement> {
 
 const StyledBoard = styled(Box)`
   margin-right: 1em;
-  min-width: 18em;
+  min-width: 18rem;
   padding: 1em 0.7em;
   border-radius: var(--br-lg);
 

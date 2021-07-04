@@ -15,58 +15,80 @@ interface User extends Session {
 
 const jobBoards: IBoard[] = [
   {
-    jobs: [
-      {
-        position: "Lead User Experience Designer",
-        location: "Lagos, Nigeria",
-        date: Date.now(),
-        companyName: "Youtube",
-      },
-    ],
+    jobs: [],
     title: "Saved",
+    name: "saved",
   },
   {
-    jobs: [
-      {
-        position: "Frontend Engineer",
-        location: "San Francisco, US",
-        date: Date.now(),
-        companyName: "google",
-      },
-    ],
+    jobs: [],
     title: "Preparing",
+    name: "preparing",
   },
   {
-    jobs: [
-      {
-        position: "Software Engineer",
-        location: "Berlin, Germany",
-        date: Date.now(),
-        companyName: "Twitter",
-      },
-    ],
+    jobs: [],
     title: "Applied",
+    name: "applied",
   },
   {
-    jobs: [
-      {
-        position: "Software Engineer Intern",
-        location: "England, London",
-        date: Date.now(),
-        companyName: "Google",
-      },
-    ],
+    jobs: [],
     title: "Interviewing",
+    name: "interviewing",
   },
 ];
 
 export interface IBoard {
   jobs: Job[];
   title: string;
+  name: string;
 }
 
 const Index = ({ session }: { session: User }) => {
   const { user } = session;
+
+  const jobsLookup = jobBoards.map((board) => board.name);
+
+  const jobs: Job[] = [
+    {
+      position: "Lead User Experience Designer",
+      location: "Lagos, Nigeria",
+      date: Date.now(),
+      companyName: "Youtube",
+      stage: "saved",
+    },
+    {
+      position: "Frontend Engineer",
+      location: "San Francisco, US",
+      date: Date.now(),
+      companyName: "google",
+      stage: "preparing",
+    },
+    {
+      position: "Lead User Experience Designer",
+      location: "Lagos, Nigeria",
+      date: Date.now(),
+      companyName: "Youtube",
+      stage: "applied",
+    },
+    {
+      position: "Software Engineer",
+      location: "Berlin, Germany",
+      date: Date.now(),
+      companyName: "Twitter",
+      stage: "preparing",
+    },
+    {
+      position: "Software Engineer Intern",
+      location: "England, London",
+      date: Date.now(),
+      companyName: "Google",
+      stage: "preparing",
+    },
+  ];
+
+  jobs.map((job) => {
+    const index = jobsLookup.indexOf(job.stage);
+    jobBoards[index].jobs.push(job);
+  });
 
   return (
     <Layout user={user} showHeader>
