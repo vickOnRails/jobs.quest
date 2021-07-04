@@ -7,6 +7,7 @@ import { Plus } from "react-feather";
 import styled from "@emotion/styled";
 
 import { Layout, Container, Boards, Job } from "../../components";
+import { ApplicationStage } from "../../types/types";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -17,22 +18,22 @@ const jobBoards: IBoard[] = [
   {
     jobs: [],
     title: "Saved",
-    name: "saved",
+    name: ApplicationStage.SAVED,
   },
   {
     jobs: [],
     title: "Preparing",
-    name: "preparing",
+    name: ApplicationStage.PREPARING,
   },
   {
     jobs: [],
     title: "Applied",
-    name: "applied",
+    name: ApplicationStage.APPLIED,
   },
   {
     jobs: [],
     title: "Interviewing",
-    name: "interviewing",
+    name: ApplicationStage.INTERVIEWING,
   },
 ];
 
@@ -58,7 +59,7 @@ const Index = ({
   const jobsLookup = jobBoards.map((board) => board.name);
 
   jobs.map((job) => {
-    const index = jobsLookup.indexOf(job.stage);
+    const index = jobsLookup.indexOf(job.applicationStage);
     jobBoards[index].jobs.push(job);
   });
 
@@ -109,7 +110,18 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
 
   try {
     const res = await fetch(url);
-    const { jobs } = await res.json();
+    const data = await res.json();
+
+    if (!data.success) {
+      return {
+        props: {
+          session,
+          error: data.message,
+        },
+      };
+    }
+
+    const { jobs } = data;
 
     return {
       props: {

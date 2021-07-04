@@ -11,8 +11,6 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
   const { colorMode } = useColorMode();
   const { position, location, companySite, date, companyName } = job;
 
-  console.log(companySite);
-
   const textColorDim = colorMode === "light" ? "gray.600" : "gray.500";
 
   return (

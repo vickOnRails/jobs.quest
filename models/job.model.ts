@@ -1,39 +1,63 @@
 import mongoose from "mongoose";
+import { ApplicationStage, ConfidenceLevel } from "../types/types";
 
 /* PetSchema will correspond to a collection in your MongoDB database. */
 const JobSchema = new mongoose.Schema(
   {
     position: {
-      /* The name of this pet */
+      /* Job position */
 
       type: String,
       required: [true, "Please provide a position"],
     },
-    company_name: {
-      /* The owner of this pet */
+    companyName: {
+      /* Company Name */
 
       type: String,
       required: [true, "Please provide the company's name"],
     },
     location: {
-      /* The species of your pet */
+      /* Company Location */
 
       type: String,
       required: [true, "Please specify the job location"],
     },
     date: {
-      /* Pet's age, if applicable */
-
+      /* Date saved */
+      type: Date,
+      default: Date.now,
+      required: [true, "Please specify the date saved"],
+    },
+    applicationDate: {
+      // date applied for job
       type: Date,
       default: Date.now,
     },
-    stage: {
-      // ensure itn is one of the following
+    confidenceLevel: {
+      /* The level of confidence that my skills overlap with the requirements */
+      type: String,
+      required: [true, "Please provide a confidence level"],
+      enum: Object.values(ConfidenceLevel),
+    },
+
+    applicationStage: {
+      /* The stage of the job application*/
+
       type: "string",
-      required: [true, "Please specify the species of your pet."],
+      default: ApplicationStage.SAVED,
+      enum: Object.values(ApplicationStage),
+    },
+
+    companySite: {
+      /* The stage of the job application*/
+
+      type: "string",
     },
   },
   { timestamps: true }
 );
 
 export default mongoose.models.Job || mongoose.model("Job", JobSchema);
+// const Job = mongoose.model("Job", JobSchema);
+
+// export default Job;

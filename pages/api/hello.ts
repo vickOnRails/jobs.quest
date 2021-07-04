@@ -8,10 +8,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   await dbConnect();
   const session = await getSession({ req });
 
-  if (!session)
+  if (!session) {
     return res.status(401).json({
       message: "Not Authorized",
     });
+  }
 
   res.status(200).json({ name: "John Doe" });
 };
