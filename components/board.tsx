@@ -4,19 +4,16 @@ import styled from "@emotion/styled";
 
 import { IBoard } from "../pages/app";
 import { BoardCard } from ".";
+import { ApplicationStage, ConfidenceLevel } from "../types/types";
 
 export interface Job {
   position: string;
   location: string;
   date: number;
   companyName: string;
-  stage:
-    | "saved"
-    | "preparing"
-    | "applied"
-    | "interviewing"
-    | "accepted"
-    | "rejected";
+  applicationStage: ApplicationStage;
+  companySite?: string;
+  confidenceLevel: ConfidenceLevel;
 }
 
 /**
@@ -31,8 +28,8 @@ export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
     <StyledBoard bg={colorMode === "light" ? "gray.100" : "gray.900"}>
       <Heading as="h3">{title}</Heading>
 
-      {jobs.map((job) => (
-        <BoardCard job={job} />
+      {jobs.map((job, idx) => (
+        <BoardCard job={job} key={idx} />
       ))}
     </StyledBoard>
   );
@@ -50,5 +47,6 @@ const StyledBoard = styled(Box)`
 
   h3 {
     font-size: 1rem;
+    margin-bottom: 1em;
   }
 `;
