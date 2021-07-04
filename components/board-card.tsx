@@ -42,6 +42,7 @@ interface BoardCardProps extends HTMLAttributes<HTMLElement> {
 
 const StyledBoardCard = styled(Box)`
   padding: 1em 0.7em;
+  margin-bottom: 1em;
   border-radius: var(--br-lg);
 
   .icon {

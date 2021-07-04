@@ -22,6 +22,8 @@ export async function dbConnect() {
       useFindAndModify: false,
     });
 
+    console.log(`connected`);
+
     connection.isConnected = db.connections[0].readyState;
   } catch (err) {
     console.log(err);

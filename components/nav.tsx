@@ -48,7 +48,7 @@ export const Nav = () => {
           color="#805AD5"
           variant="outline"
           onClick={() => signOut()}
-          className="hide-mobile"
+          //   className="hide-mobile"
         >
           Log Out
         </Button>

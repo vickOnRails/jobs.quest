@@ -42,48 +42,20 @@ export interface IBoard {
   name: string;
 }
 
-const Index = ({ session }: { session: User }) => {
+const Index = ({
+  session,
+  jobs,
+  error,
+}: {
+  session: User;
+  jobs: Job[];
+  error?: string;
+}) => {
   const { user } = session;
 
-  const jobsLookup = jobBoards.map((board) => board.name);
+  if (error) return <p>Error</p>;
 
-  const jobs: Job[] = [
-    {
-      position: "Lead User Experience Designer",
-      location: "Lagos, Nigeria",
-      date: Date.now(),
-      companyName: "Youtube",
-      stage: "saved",
-    },
-    {
-      position: "Frontend Engineer",
-      location: "San Francisco, US",
-      date: Date.now(),
-      companyName: "google",
-      stage: "preparing",
-    },
-    {
-      position: "Lead User Experience Designer",
-      location: "Lagos, Nigeria",
-      date: Date.now(),
-      companyName: "Youtube",
-      stage: "applied",
-    },
-    {
-      position: "Software Engineer",
-      location: "Berlin, Germany",
-      date: Date.now(),
-      companyName: "Twitter",
-      stage: "preparing",
-    },
-    {
-      position: "Software Engineer Intern",
-      location: "England, London",
-      date: Date.now(),
-      companyName: "Google",
-      stage: "preparing",
-    },
-  ];
+  const jobsLookup = jobBoards.map((board) => board.name);
 
   jobs.map((job) => {
     const index = jobsLookup.indexOf(job.stage);
@@ -121,6 +93,8 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   const { req } = client;
   const session = await getSession({ req });
 
+  const url = `http://localhost:3000/api/jobs`;
+
   // Redirect to root page if user is not authenticated
   if (!session) {
     return {
@@ -131,12 +105,27 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
     };
   }
 
-  // else return auth session
-  return {
-    props: {
-      session,
-    },
-  };
+  // Get all jobs
+
+  try {
+    const res = await fetch(url);
+    const { jobs } = await res.json();
+
+    return {
+      props: {
+        session,
+        jobs,
+      },
+    };
+  } catch (err) {
+    console.log(err.message);
+    return {
+      props: {
+        session,
+        error: err.message,
+      },
+    };
+  }
 };
 
 const StyledTrackerContainer = styled(Container)`
