@@ -7,3 +7,4 @@ export * from "./board";
 export * from "./boards";
 export * from "./board-card";
 export * from "./footer";
+export * from "./bottom-sheet-modal";

@@ -7,9 +7,14 @@ import { Plus } from "react-feather";
 import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 
-import { Layout, Container, Boards, Job } from "../../components";
+import {
+  Layout,
+  Container,
+  Boards,
+  Job,
+  BottomSheetModal,
+} from "../../components";
 import { ApplicationStage } from "../../types/types";
-import jobModel from "../../models/job.model";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -119,13 +124,12 @@ const Index = ({
       </RootAppContext.Provider>
 
       {jobInfoModalOpen && (
-        <motion.div
-          exit={{
-            opacity: 0,
-          }}
+        <BottomSheetModal
+          isOpen={jobInfoModalOpen}
+          onClose={toggleJobInfoModal}
         >
           We Kept it open
-        </motion.div>
+        </BottomSheetModal>
       )}
     </Layout>
   );

@@ -15,7 +15,6 @@ export const GlobalStyles = () => (
         padding: 0;
         margin: 0;
         font-family: var(--chakra-fonts-heading);
-        overflow-x: hidden;
       }
 
       * {
