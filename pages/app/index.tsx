@@ -1,19 +1,31 @@
-import React from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
 import { DefaultUser, Session } from "next-auth";
 import { Button, Flex } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
+import { motion } from "framer-motion";
 
 import { Layout, Container, Boards, Job } from "../../components";
 import { ApplicationStage } from "../../types/types";
+import jobModel from "../../models/job.model";
 
 // Interface for user from NextAuth library
 interface User extends Session {
   user: DefaultUser;
 }
 
+// interface for the context of the page
+// TODO: I might have to move the context to the _app.js file to wrap the whole application
+export interface AppContextProps {
+  jobInfoModalOpen: boolean;
+  toggleJobInfoModal: () => void;
+}
+
+export const RootAppContext = createContext<AppContextProps | null>(null);
+
+// structure for the job data
 const jobBoards: IBoard[] = [
   {
     jobs: [],
@@ -54,38 +66,67 @@ const Index = ({
 }) => {
   const { user } = session;
 
+  const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
+
+  const [jobsLoaded, setJobsLoaded] = useState(false);
+
+  const toggleJobInfoModal = () => {
+    setJobInfoModalOpen(!jobInfoModalOpen);
+  };
+
   if (error) return <p>{error}</p>;
 
-  const jobsLookup = jobBoards.map((board) => board.name);
+  useEffect(() => {
+    // This is a fix for the useEffect not running on the client
+    // run this function only when jobsLoaded changes (Technically only runs the once)
+    if (!jobsLoaded) {
+      const jobsLookup = jobBoards.map((board) => board.name);
 
-  jobs.map((job) => {
-    const index = jobsLookup.indexOf(job.applicationStage);
-    jobBoards[index].jobs.push(job);
-  });
+      jobs.map((job) => {
+        const index = jobsLookup.indexOf(job.applicationStage);
+        jobBoards[index].jobs.push(job);
+      });
+
+      setJobsLoaded(true);
+    }
+  }, [jobsLoaded]);
 
   return (
     <Layout user={user} showHeader>
-      <StyledTrackerContainer className="jb-tracker">
-        <Flex direction="column">
-          <Button
-            leftIcon={<Plus />}
-            className="jb-tracker__add-job"
-            variant="solid"
-            bgColor="purple.500"
-            alignSelf="flex-end"
-            color="white"
-            _hover={{
-              bgColor: "purple.400",
-            }}
-            _active={{
-              bgColor: "purple.400",
-            }}
-          >
-            Add Job
-          </Button>
-        </Flex>
-        <Boards boards={jobBoards} />
-      </StyledTrackerContainer>
+      <RootAppContext.Provider value={{ jobInfoModalOpen, toggleJobInfoModal }}>
+        <StyledTrackerContainer className="jb-tracker">
+          <Flex direction="column">
+            <Button
+              leftIcon={<Plus />}
+              className="jb-tracker__add-job"
+              variant="solid"
+              bgColor="purple.500"
+              onClick={toggleJobInfoModal}
+              alignSelf="flex-end"
+              color="white"
+              _hover={{
+                bgColor: "purple.400",
+              }}
+              _active={{
+                bgColor: "purple.400",
+              }}
+            >
+              Add Job
+            </Button>
+          </Flex>
+          <Boards boards={jobBoards} />
+        </StyledTrackerContainer>
+      </RootAppContext.Provider>
+
+      {jobInfoModalOpen && (
+        <motion.div
+          exit={{
+            opacity: 0,
+          }}
+        >
+          We Kept it open
+        </motion.div>
+      )}
     </Layout>
   );
 };
