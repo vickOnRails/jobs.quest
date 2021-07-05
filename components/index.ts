@@ -6,3 +6,4 @@ export * from "./header";
 export * from "./board";
 export * from "./boards";
 export * from "./board-card";
+export * from "./footer";

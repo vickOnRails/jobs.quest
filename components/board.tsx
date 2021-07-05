@@ -42,6 +42,8 @@ interface BoardProps extends HTMLAttributes<HTMLElement> {
 const StyledBoard = styled(Box)`
   margin-right: 1em;
   min-width: 18rem;
+  height: auto;
+  max-height: 100vh;
   padding: 1em 0.7em;
   border-radius: var(--br-lg);
 

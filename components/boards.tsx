@@ -23,6 +23,8 @@ interface BoardsProps extends HTMLAttributes<HTMLElement> {
 
 const StyledBoard = styled.section`
   display: flex;
-  min-height: 100vh;
-  overflow-x: scroll;
+  align-items: flex-start;
+  max-height: 100vh;
+  min-height: 60vh;
+  overflow-x: auto;
 `;
