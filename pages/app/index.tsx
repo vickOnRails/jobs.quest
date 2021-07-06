@@ -2,32 +2,19 @@ import React, { createContext, useEffect, useState } from "react";
 import { getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
 import { DefaultUser, Session } from "next-auth";
-import {
-  Button,
-  Flex,
-  Input,
-  FormLabel,
-  FormControl,
-  Box,
-  Text,
-  Divider,
-  Select,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Flex, useToast } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
-import { useFormik } from "formik";
 
 import {
   Layout,
   Container,
   Boards,
   Job,
-  FormErrorText,
+  CreateEditJob,
   BottomSheetModal,
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
-import { breakpoints } from "../../theme";
 import { TCreateJobBody } from "../api/jobs";
 
 // Interface for user from NextAuth library
@@ -42,9 +29,11 @@ export interface AppContextProps {
   toggleJobInfoModal: () => void;
 }
 
+// root application context
 export const RootAppContext = createContext<AppContextProps | null>(null);
 
 // structure for the job data
+// this structure will get filled when the jobs data come in
 const jobBoards: IBoard[] = [
   {
     jobs: [],
@@ -68,38 +57,6 @@ const jobBoards: IBoard[] = [
   },
 ];
 
-// function for validating job form
-const validate = (values: TCreateJobBody) => {
-  const {
-    position,
-    companySite,
-    location,
-    companyName,
-    confidenceLevel,
-    jobLink,
-  } = values;
-
-  const errors: any = {};
-
-  if (!position) {
-    errors.position = "Job position is a required field";
-  }
-
-  if (!companySite) errors.companySite = "Company site is a required field";
-  if (!companyName) errors.companyName = "Company Name is a required field";
-  if (!jobLink) errors.jobLink = "Job Link is a required field";
-  if (!location) errors.location = "Location is a required field";
-
-  if (!confidenceLevel) {
-    errors.confidenceLevel = "Location is a required field";
-  } else if (confidenceLevel === ConfidenceLevel.UNSELECTED) {
-    errors.confidenceLevel = "Please select a valid confidence level";
-  }
-
-  console.log(errors);
-  return errors;
-};
-
 // initial form values
 const initialValues: TCreateJobBody = {
   position: "",
@@ -115,31 +72,9 @@ export interface IBoard {
   name: string;
 }
 
-const confidenceLevelOptions = Object.values(ConfidenceLevel);
-
-// function to create new Job data
-const createJob = async (values: TCreateJobBody): Promise<Response> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const res = await fetch("/api/jobs", {
-        body: JSON.stringify(values),
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (res.ok) {
-        resolve(res);
-      } else {
-        throw new Error(res.statusText);
-      }
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
-
+/**
+ * Index - main page of the app where all jobs are tracked
+ */
 const Index = ({
   session,
   jobs,
@@ -151,51 +86,18 @@ const Index = ({
 }) => {
   const { user } = session;
 
+  // state controlling modal for job info
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
-  const toast = useToast();
-  const {
-    handleChange,
-    values: {
-      confidenceLevel,
-      companyName,
-      companySite,
-      position,
-      location,
-      jobLink,
-    },
-    handleSubmit,
-    errors,
-    handleBlur,
-    isSubmitting,
-    touched,
-  } = useFormik({
-    initialValues,
-    validate,
-    onSubmit: async (values) => {
-      try {
-        const res = await createJob(values);
-        if (res.ok) {
-          toast({
-            title: "Job Created",
-            description: "Your job has been added to the database",
-            status: "success",
-            duration: 1000,
-            isClosable: true,
-          });
-          setJobInfoModalOpen(false);
-        }
-      } catch (err) {
-        console.log(`An error occurred: ${err.message}`);
-      }
-    },
-  });
 
+  // quick fix for when useEffect doesnt run on the client side
   const [jobsLoaded, setJobsLoaded] = useState(false);
 
   const toggleJobInfoModal = () => {
     setJobInfoModalOpen(!jobInfoModalOpen);
   };
 
+  // quickly ball out if we experience an error
+  // TODO: handle error more robustly
   if (error) return <p>{error}</p>;
 
   useEffect(() => {
@@ -212,9 +114,6 @@ const Index = ({
       setJobsLoaded(true);
     }
   }, [jobsLoaded]);
-
-  console.log(errors);
-  console.log(touched);
 
   return (
     <Layout user={user} showHeader>
@@ -239,6 +138,8 @@ const Index = ({
               Add Job
             </Button>
           </Flex>
+
+          {/* render all the jobs here */}
           <Boards boards={jobBoards} />
 
           {jobInfoModalOpen && (
@@ -247,149 +148,10 @@ const Index = ({
               isOpen={jobInfoModalOpen}
               onClose={toggleJobInfoModal}
             >
-              <StyledJobInfoForm onSubmit={handleSubmit}>
-                <Flex className="job-info__flex">
-                  <FormControl id="position" className="job-info__form-control">
-                    <FormLabel>Job Position</FormLabel>
-                    <Input
-                      type="text"
-                      placeholder="Job Position"
-                      value={position}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                    />
-
-                    {errors.position && touched.position && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.position}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-
-                  <FormControl
-                    id="confidenceLevel"
-                    className="job-info__form-control"
-                  >
-                    <FormLabel>Confidence Level</FormLabel>
-                    <Select
-                      onChange={handleChange}
-                      defaultValue={confidenceLevel}
-                      onBlur={handleBlur}
-                    >
-                      {confidenceLevelOptions.map((option) => {
-                        if (option === ConfidenceLevel.UNSELECTED)
-                          return (
-                            <option key={option} disabled>
-                              {option}
-                            </option>
-                          );
-                        return <option key={option}>{option}</option>;
-                      })}
-                    </Select>
-
-                    {errors.confidenceLevel && touched.confidenceLevel && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.confidenceLevel}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-
-                  <FormControl id="jobLink" className="job-info__form-control">
-                    <FormLabel>Link to Job</FormLabel>
-                    <Input
-                      type="url"
-                      value={jobLink}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      // id="jobLink"
-                      placeholder="Link to Job Post"
-                    />
-                    {errors.jobLink && touched.jobLink && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.jobLink}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-
-                  <FormControl id="location" className="job-info__form-control">
-                    <FormLabel>Location</FormLabel>
-                    <Input
-                      type="text"
-                      value={location}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="Job Location"
-                    />
-                    {errors.location && touched.location && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.location}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-                </Flex>
-
-                <Box mb={5} mt={3}>
-                  <Text fontWeight="bold" mb={1}>
-                    Company Information
-                  </Text>
-                  <Divider />
-                </Box>
-
-                <Flex>
-                  <FormControl
-                    id="companyName"
-                    className="job-info__form-control"
-                  >
-                    <FormLabel>Company Name</FormLabel>
-                    <Input
-                      type="text"
-                      value={companyName}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter company name"
-                      id="companyName"
-                    />
-                    {errors.companyName && touched.companyName && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.companyName}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-
-                  <FormControl
-                    id="companySite"
-                    className="job-info__form-control"
-                  >
-                    <FormLabel>Company Site</FormLabel>
-                    <Input
-                      type="url"
-                      id="companySite"
-                      value={companySite}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Company website"
-                    />
-                    {errors.companySite && touched.companySite && (
-                      <FormErrorText>
-                        <Text mb={0}>{errors.companySite}</Text>
-                      </FormErrorText>
-                    )}
-                  </FormControl>
-                </Flex>
-
-                <Button
-                  type="submit"
-                  variant="solid"
-                  isLoading={isSubmitting}
-                  loadingText="Submitting"
-                  bgColor="purple.500"
-                  color="white"
-                  _hover={{ bgColor: "purple.400" }}
-                  _active={{ bgColor: "purple.400" }}
-                >
-                  Create Job
-                </Button>
-              </StyledJobInfoForm>
+              <CreateEditJob
+                initialValues={initialValues}
+                setJobInfoModalOpen={setJobInfoModalOpen}
+              />
             </BottomSheetModal>
           )}
         </StyledTrackerContainer>
@@ -402,38 +164,6 @@ const StyledTrackerContainer = styled(Container)`
   .jb-tracker__add-job {
     align-self: flex-end;
     margin-bottom: 1em;
-  }
-`;
-
-const StyledJobInfoForm = styled.form`
-  height: 100%;
-
-  .job-info__flex {
-    flex-direction: column;
-  }
-  .job-info__flex {
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  .job-info__form-control {
-    margin-bottom: 1em;
-  }
-
-  @media screen and (min-width: ${breakpoints.sm}) {
-    .job-info__flex {
-      flex-direction: row;
-      justify-content: flex-start;
-    }
-    .job-info__form-control {
-      margin-right: 0.5em;
-      flex-basis: 48%;
-    }
-  }
-
-  @media screen and (min-width: ${breakpoints.md}) {
-    .job-info__form-control {
-      flex-basis: 32%;
-    }
   }
 `;
 
