@@ -15,6 +15,7 @@ export interface Job {
   applicationStage: ApplicationStage;
   companySite?: string;
   confidenceLevel: ConfidenceLevel;
+  jobLink: string;
 }
 
 /**

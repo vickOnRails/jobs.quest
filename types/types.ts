@@ -4,6 +4,7 @@ export enum ConfidenceLevel {
   FAIRLY_CONFIDENT = "Fairly Confident",
   CONFIDENT = "Confident",
   HIGHLY_CONFIDENT = "Highly Confident",
+  UNSELECTED = "Unselected",
 }
 
 export enum ApplicationStage {

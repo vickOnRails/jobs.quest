@@ -26,6 +26,7 @@ import {
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
 import { breakpoints } from "../../theme";
+import { TCreateJobBody } from "../api/jobs";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -66,18 +67,23 @@ const jobBoards: IBoard[] = [
 ];
 
 // function for validating job form
-const validate = (values: any) => {
-  const errors = {};
+const validate = (values: TCreateJobBody) => {
+  const { position, companySite, companyName, confidenceLevel, jobLink } =
+    values;
+  const errors: any = {};
 
-  console.log(values);
+  if (!position) {
+    errors.position = "Job position is a required field";
+  }
+  // ensure all fields are filled in
 
-  // return errors;
+  return errors;
 };
 
 // initial form values
-const initialValues = {
+const initialValues: TCreateJobBody = {
   position: "",
-  confidenceLevel: "",
+  confidenceLevel: ConfidenceLevel.UNSELECTED,
   location: "",
   jobLink: "",
   companyName: "",
@@ -91,6 +97,29 @@ export interface IBoard {
 
 const confidenceLevelOptions = Object.values(ConfidenceLevel);
 
+// function to create new Job data
+const createJob = async (values: TCreateJobBody): Promise<Response> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetch("/api/jobs", {
+        body: JSON.stringify(values),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        resolve(res);
+      } else {
+        throw new Error(res.statusText);
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 const Index = ({
   session,
   jobs,
@@ -100,6 +129,10 @@ const Index = ({
   jobs: Job[];
   error?: string;
 }) => {
+  const { user } = session;
+
+  const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
+
   const {
     handleChange,
     values: {
@@ -111,18 +144,24 @@ const Index = ({
       jobLink,
     },
     handleSubmit,
+    errors,
     isSubmitting,
   } = useFormik({
     initialValues,
     validate,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
+
+      try {
+        const res = await createJob(values);
+        if (res.ok) {
+          console.log(await res.json());
+        }
+      } catch (err) {
+        console.log(`An error occurred: ${err.message}`);
+      }
     },
   });
-
-  const { user } = session;
-
-  const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
 
   const [jobsLoaded, setJobsLoaded] = useState(false);
 
@@ -179,23 +218,21 @@ const Index = ({
               onClose={toggleJobInfoModal}
             >
               <StyledJobInfoForm onSubmit={handleSubmit}>
-                <StyledJobInfoForm>
-                  <Flex className="job-info__flex">
-                    <FormControl
-                      id="position"
-                      className="job-info__form-control"
-                    >
-                      <FormLabel>Job Position</FormLabel>
-                      <Input
-                        required
-                        type="text"
-                        // name="position"
-                        placeholder="Job Position"
-                        value={position}
-                        onChange={handleChange}
-                      />
-                    </FormControl>
-                    <FormControl
+                <Flex className="job-info__flex">
+                  <FormControl id="position" className="job-info__form-control">
+                    <FormLabel>Job Position</FormLabel>
+                    <Input
+                      // required
+                      type="text"
+                      // name="position"
+                      placeholder="Job Position"
+                      value={position}
+                      onChange={handleChange}
+                    />
+
+                    {errors.position && <p>{errors.position}</p>}
+                  </FormControl>
+                  {/* <FormControl
                       id="confidenceLevel"
                       className="job-info__form-control"
                     >
@@ -212,87 +249,82 @@ const Index = ({
                           <option key={option}>{option}</option>
                         ))}
                       </Select>
-                    </FormControl>
-                    <FormControl
-                      id="jobLink"
-                      className="job-info__form-control"
-                    >
-                      <FormLabel>Link to Job</FormLabel>
-                      <Input
-                        type="url"
-                        required
-                        value={jobLink}
-                        onChange={handleChange}
-                        // id="jobLink"
-                        placeholder="Link to Job Post"
-                      />
-                      {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                    </FormControl>
+                    </FormControl> */}
+                  <FormControl id="jobLink" className="job-info__form-control">
+                    <FormLabel>Link to Job</FormLabel>
+                    <Input
+                      type="url"
+                      required
+                      value={jobLink}
+                      onChange={handleChange}
+                      // id="jobLink"
+                      placeholder="Link to Job Post"
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
 
-                    <FormControl
-                      id="location"
-                      className="job-info__form-control"
-                    >
-                      <FormLabel>Location</FormLabel>
-                      <Input
-                        type="text"
-                        required
-                        value={location}
-                        onChange={handleChange}
-                        placeholder="Job Location"
-                      />
-                    </FormControl>
-                  </Flex>
+                  <FormControl id="location" className="job-info__form-control">
+                    <FormLabel>Location</FormLabel>
+                    <Input
+                      type="text"
+                      required
+                      value={location}
+                      onChange={handleChange}
+                      placeholder="Job Location"
+                    />
+                  </FormControl>
+                </Flex>
 
-                  <Box mb={5} mt={3}>
-                    <Text fontWeight="bold" mb={1}>
-                      Company Information
-                    </Text>
-                    <Divider />
-                  </Box>
+                <Box mb={5} mt={3}>
+                  <Text fontWeight="bold" mb={1}>
+                    Company Information
+                  </Text>
+                  <Divider />
+                </Box>
 
-                  <Flex>
-                    <FormControl
-                      id="companyName"
-                      className="job-info__form-control"
-                    >
-                      <FormLabel>Company Name</FormLabel>
-                      <Input
-                        type="text"
-                        required
-                        value={companyName}
-                        onChange={handleChange}
-                        placeholder="Enter company name"
-                        id="companyName"
-                      />
-                    </FormControl>
-                    <FormControl
-                      id="companySite"
-                      className="job-info__form-control"
-                    >
-                      <FormLabel>Company Site</FormLabel>
-                      <Input
-                        type="url"
-                        id="companySite"
-                        value={companySite}
-                        onChange={handleChange}
-                        placeholder="Company website"
-                      />
-                    </FormControl>
-                  </Flex>
-
-                  <Button
-                    type="submit"
-                    variant="solid"
-                    loading={isSubmitting}
-                    bgColor="purple.500"
-                    color="white"
-                    _hover={{ bgColor: "purple.400" }}
-                    _active={{ bgColor: "purple.400" }}
+                <Flex>
+                  <FormControl
+                    id="companyName"
+                    className="job-info__form-control"
                   >
-                    Create Job
-                  </Button>
-                </StyledJobInfoForm>
+                    <FormLabel>Company Name</FormLabel>
+                    <Input
+                      type="text"
+                      required
+                      value={companyName}
+                      onChange={handleChange}
+                      placeholder="Enter company name"
+                      id="companyName"
+                    />
+                  </FormControl>
+                  <FormControl
+                    id="companySite"
+                    className="job-info__form-control"
+                  >
+                    <FormLabel>Company Site</FormLabel>
+                    <Input
+                      type="url"
+                      id="companySite"
+                      value={companySite}
+                      onChange={handleChange}
+                      placeholder="Company website"
+                    />
+                  </FormControl>
+                </Flex>
+
+                <Button
+                  type="submit"
+                  variant="solid"
+                  isLoading={isSubmitting}
+                  loadingText="Submitting"
+                  // onClick={handleSubmit}
+                  bgColor="purple.500"
+                  color="white"
+                  _hover={{ bgColor: "purple.400" }}
+                  _active={{ bgColor: "purple.400" }}
+                >
+                  Create Job
+                </Button>
               </StyledJobInfoForm>
             </BottomSheetModal>
           )}

@@ -4,9 +4,14 @@ import { getSession } from "next-auth/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Job as TJob } from "../../../components";
 
-type TCreateJobBody = Pick<
+export type TCreateJobBody = Pick<
   TJob,
-  "companyName" | "location" | "position" | "companySite" | "confidenceLevel"
+  | "companyName"
+  | "location"
+  | "position"
+  | "companySite"
+  | "confidenceLevel"
+  | "jobLink"
 >;
 interface JobRequest extends NextApiRequest {
   body: TCreateJobBody;
@@ -17,7 +22,7 @@ export default async (req: JobRequest, res: NextApiResponse) => {
   await dbConnect();
 
   // get current session information
-  const session = await getSession({ req });
+  // const session = await getSession({ req });
 
   // return for unauthorized users
   // if (!session) {
@@ -43,15 +48,23 @@ export default async (req: JobRequest, res: NextApiResponse) => {
 
     // Create New Job Entry
     case "POST":
+      const { body } = req;
+
       const {
-        body: { companyName, confidenceLevel, location, position, companySite },
-      } = req;
+        companyName,
+        jobLink,
+        position,
+        companySite,
+        location,
+        confidenceLevel,
+      } = body;
 
       try {
         const newJob = new Job({
           position,
           companyName,
           confidenceLevel,
+          jobLink,
           location,
           companySite,
         });
