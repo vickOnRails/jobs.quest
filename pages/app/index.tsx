@@ -2,10 +2,20 @@ import React, { createContext, useEffect, useState } from "react";
 import { getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
 import { DefaultUser, Session } from "next-auth";
-import { Button, Flex } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Input,
+  FormLabel,
+  FormControl,
+  Box,
+  Text,
+  Divider,
+  Select,
+} from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
-import { motion } from "framer-motion";
+import { Formik, useFormik } from "formik";
 
 import {
   Layout,
@@ -14,7 +24,8 @@ import {
   Job,
   BottomSheetModal,
 } from "../../components";
-import { ApplicationStage } from "../../types/types";
+import { ApplicationStage, ConfidenceLevel } from "../../types/types";
+import { breakpoints } from "../../theme";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -54,11 +65,31 @@ const jobBoards: IBoard[] = [
   },
 ];
 
+// function for validating job form
+const validate = (values: any) => {
+  const errors = {};
+
+  console.log(values);
+
+  // return errors;
+};
+
+// initial form values
+const initialValues = {
+  position: "",
+  confidenceLevel: "",
+  location: "",
+  jobLink: "",
+  companyName: "",
+  companySite: "",
+};
 export interface IBoard {
   jobs: Job[];
   title: string;
   name: string;
 }
+
+const confidenceLevelOptions = Object.values(ConfidenceLevel);
 
 const Index = ({
   session,
@@ -69,6 +100,26 @@ const Index = ({
   jobs: Job[];
   error?: string;
 }) => {
+  const {
+    handleChange,
+    values: {
+      confidenceLevel,
+      companyName,
+      companySite,
+      position,
+      location,
+      jobLink,
+    },
+    handleSubmit,
+    isSubmitting,
+  } = useFormik({
+    initialValues,
+    validate,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
   const { user } = session;
 
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
@@ -120,20 +171,175 @@ const Index = ({
             </Button>
           </Flex>
           <Boards boards={jobBoards} />
+
+          {jobInfoModalOpen && (
+            <BottomSheetModal
+              title="Job Details"
+              isOpen={jobInfoModalOpen}
+              onClose={toggleJobInfoModal}
+            >
+              <StyledJobInfoForm onSubmit={handleSubmit}>
+                <StyledJobInfoForm>
+                  <Flex className="job-info__flex">
+                    <FormControl
+                      id="position"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Job Position</FormLabel>
+                      <Input
+                        required
+                        type="text"
+                        // name="position"
+                        placeholder="Job Position"
+                        value={position}
+                        onChange={handleChange}
+                      />
+                    </FormControl>
+                    <FormControl
+                      id="confidenceLevel"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Confidence Level</FormLabel>
+                      <Select
+                        required
+                        onChange={handleChange}
+                        defaultValue="placeholder"
+                      >
+                        <option value="placeholder" disabled selected>
+                          --Choose confidence level--
+                        </option>
+                        {confidenceLevelOptions.map((option) => (
+                          <option key={option}>{option}</option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl
+                      id="jobLink"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Link to Job</FormLabel>
+                      <Input
+                        type="url"
+                        required
+                        value={jobLink}
+                        onChange={handleChange}
+                        // id="jobLink"
+                        placeholder="Link to Job Post"
+                      />
+                      {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                    </FormControl>
+
+                    <FormControl
+                      id="location"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Location</FormLabel>
+                      <Input
+                        type="text"
+                        required
+                        value={location}
+                        onChange={handleChange}
+                        placeholder="Job Location"
+                      />
+                    </FormControl>
+                  </Flex>
+
+                  <Box mb={5} mt={3}>
+                    <Text fontWeight="bold" mb={1}>
+                      Company Information
+                    </Text>
+                    <Divider />
+                  </Box>
+
+                  <Flex>
+                    <FormControl
+                      id="companyName"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Company Name</FormLabel>
+                      <Input
+                        type="text"
+                        required
+                        value={companyName}
+                        onChange={handleChange}
+                        placeholder="Enter company name"
+                        id="companyName"
+                      />
+                    </FormControl>
+                    <FormControl
+                      id="companySite"
+                      className="job-info__form-control"
+                    >
+                      <FormLabel>Company Site</FormLabel>
+                      <Input
+                        type="url"
+                        id="companySite"
+                        value={companySite}
+                        onChange={handleChange}
+                        placeholder="Company website"
+                      />
+                    </FormControl>
+                  </Flex>
+
+                  <Button
+                    type="submit"
+                    variant="solid"
+                    loading={isSubmitting}
+                    bgColor="purple.500"
+                    color="white"
+                    _hover={{ bgColor: "purple.400" }}
+                    _active={{ bgColor: "purple.400" }}
+                  >
+                    Create Job
+                  </Button>
+                </StyledJobInfoForm>
+              </StyledJobInfoForm>
+            </BottomSheetModal>
+          )}
         </StyledTrackerContainer>
       </RootAppContext.Provider>
-
-      {jobInfoModalOpen && (
-        <BottomSheetModal
-          isOpen={jobInfoModalOpen}
-          onClose={toggleJobInfoModal}
-        >
-          We Kept it open
-        </BottomSheetModal>
-      )}
     </Layout>
   );
 };
+
+const StyledTrackerContainer = styled(Container)`
+  .jb-tracker__add-job {
+    align-self: flex-end;
+    margin-bottom: 1em;
+  }
+`;
+
+const StyledJobInfoForm = styled.form`
+  height: 100%;
+
+  .job-info__flex {
+    flex-direction: column;
+  }
+  .job-info__flex {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .job-info__form-control {
+    margin-bottom: 1em;
+  }
+
+  @media screen and (min-width: ${breakpoints.sm}) {
+    .job-info__flex {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+    .job-info__form-control {
+      margin-right: 0.5em;
+      flex-basis: 48%;
+    }
+  }
+
+  @media screen and (min-width: ${breakpoints.md}) {
+    .job-info__form-control {
+      flex-basis: 32%;
+    }
+  }
+`;
 
 export const getServerSideProps: GetServerSideProps = async (client) => {
   const { req } = client;
@@ -185,10 +391,4 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   }
 };
 
-const StyledTrackerContainer = styled(Container)`
-  .jb-tracker__add-job {
-    align-self: flex-end;
-    margin-bottom: 1em;
-  }
-`;
 export default Index;

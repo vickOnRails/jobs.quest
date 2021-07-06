@@ -18,10 +18,11 @@ import {
 
 // FIXME: use appropriate types
 
-export const BottomSheetModal: FC<ModalProps> = ({
+export const BottomSheetModal: FC<BottomSheetModal> = ({
   children,
   isOpen,
   onClose,
+  title,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -33,17 +34,21 @@ export const BottomSheetModal: FC<ModalProps> = ({
         bottom="0"
         margin="0"
       >
-        <ModalHeader>Modal Title</ModalHeader>
+        {title && <ModalHeader>{title}</ModalHeader>}
         <ModalCloseButton />
         <ModalBody>{children}</ModalBody>
 
-        <ModalFooter>
+        {/* <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
             Close
           </Button>
           <Button variant="ghost">Secondary Action</Button>
-        </ModalFooter>
+        </ModalFooter> */}
       </ModalContent>
     </Modal>
   );
 };
+
+interface BottomSheetModal extends ModalProps {
+  title?: string;
+}

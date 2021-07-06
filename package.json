@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^1.6.4",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "formik": "^2.2.9",
     "framer-motion": "^4",
     "husky": "^7.0.0",
     "mongoose": "^5.13.0",

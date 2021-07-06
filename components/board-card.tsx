@@ -9,7 +9,7 @@ import { formatDate } from "../utils";
 
 export const BoardCard: FC<BoardCardProps> = ({ job }) => {
   const { colorMode } = useColorMode();
-  const { position, location, companySite, date, companyName } = job;
+  const { position, location, companySite, date, companyName, _id } = job;
 
   const textColorDim = colorMode === "light" ? "gray.600" : "gray.500";
 
@@ -59,6 +59,7 @@ const StyledBoardCard = styled(Box)`
   padding: 1em 0.7em;
   margin-bottom: 1em;
   border-radius: var(--br-lg);
+  display: block;
 
   .icon {
     height: 1em;

@@ -36,9 +36,10 @@ export const Nav = () => {
         >
           <GitHub />
         </Button>
-        <Button variant="outline" className="hide-desktop">
+
+        {/* <Button variant="outline" className="hide-desktop">
           <MoreVertical />
-        </Button>
+        </Button> */}
 
         <Button onClick={toggleColorMode} variant="outline">
           {colorMode === "light" ? <Moon /> : <Sun />}

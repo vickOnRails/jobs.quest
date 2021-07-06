@@ -7,6 +7,7 @@ import { BoardCard } from ".";
 import { ApplicationStage, ConfidenceLevel } from "../types/types";
 
 export interface Job {
+  _id: string;
   position: string;
   location: string;
   date: number;
