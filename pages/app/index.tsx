@@ -12,16 +12,18 @@ import {
   Text,
   Divider,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 
 import {
   Layout,
   Container,
   Boards,
   Job,
+  FormErrorText,
   BottomSheetModal,
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
@@ -68,15 +70,33 @@ const jobBoards: IBoard[] = [
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
-  const { position, companySite, companyName, confidenceLevel, jobLink } =
-    values;
+  const {
+    position,
+    companySite,
+    location,
+    companyName,
+    confidenceLevel,
+    jobLink,
+  } = values;
+
   const errors: any = {};
 
   if (!position) {
     errors.position = "Job position is a required field";
   }
-  // ensure all fields are filled in
 
+  if (!companySite) errors.companySite = "Company site is a required field";
+  if (!companyName) errors.companyName = "Company Name is a required field";
+  if (!jobLink) errors.jobLink = "Job Link is a required field";
+  if (!location) errors.location = "Location is a required field";
+
+  if (!confidenceLevel) {
+    errors.confidenceLevel = "Location is a required field";
+  } else if (confidenceLevel === ConfidenceLevel.UNSELECTED) {
+    errors.confidenceLevel = "Please select a valid confidence level";
+  }
+
+  console.log(errors);
   return errors;
 };
 
@@ -132,7 +152,7 @@ const Index = ({
   const { user } = session;
 
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
-
+  const toast = useToast();
   const {
     handleChange,
     values: {
@@ -145,17 +165,24 @@ const Index = ({
     },
     handleSubmit,
     errors,
+    handleBlur,
     isSubmitting,
+    touched,
   } = useFormik({
     initialValues,
     validate,
     onSubmit: async (values) => {
-      console.log(values);
-
       try {
         const res = await createJob(values);
         if (res.ok) {
-          console.log(await res.json());
+          toast({
+            title: "Job Created",
+            description: "Your job has been added to the database",
+            status: "success",
+            duration: 1000,
+            isClosable: true,
+          });
+          setJobInfoModalOpen(false);
         }
       } catch (err) {
         console.log(`An error occurred: ${err.message}`);
@@ -185,6 +212,9 @@ const Index = ({
       setJobsLoaded(true);
     }
   }, [jobsLoaded]);
+
+  console.log(errors);
+  console.log(touched);
 
   return (
     <Layout user={user} showHeader>
@@ -222,56 +252,79 @@ const Index = ({
                   <FormControl id="position" className="job-info__form-control">
                     <FormLabel>Job Position</FormLabel>
                     <Input
-                      // required
                       type="text"
-                      // name="position"
                       placeholder="Job Position"
                       value={position}
+                      onBlur={handleBlur}
                       onChange={handleChange}
                     />
 
-                    {errors.position && <p>{errors.position}</p>}
+                    {errors.position && touched.position && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.position}</Text>
+                      </FormErrorText>
+                    )}
                   </FormControl>
-                  {/* <FormControl
-                      id="confidenceLevel"
-                      className="job-info__form-control"
+
+                  <FormControl
+                    id="confidenceLevel"
+                    className="job-info__form-control"
+                  >
+                    <FormLabel>Confidence Level</FormLabel>
+                    <Select
+                      onChange={handleChange}
+                      defaultValue={confidenceLevel}
+                      onBlur={handleBlur}
                     >
-                      <FormLabel>Confidence Level</FormLabel>
-                      <Select
-                        required
-                        onChange={handleChange}
-                        defaultValue="placeholder"
-                      >
-                        <option value="placeholder" disabled selected>
-                          --Choose confidence level--
-                        </option>
-                        {confidenceLevelOptions.map((option) => (
-                          <option key={option}>{option}</option>
-                        ))}
-                      </Select>
-                    </FormControl> */}
+                      {confidenceLevelOptions.map((option) => {
+                        if (option === ConfidenceLevel.UNSELECTED)
+                          return (
+                            <option key={option} disabled>
+                              {option}
+                            </option>
+                          );
+                        return <option key={option}>{option}</option>;
+                      })}
+                    </Select>
+
+                    {errors.confidenceLevel && touched.confidenceLevel && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.confidenceLevel}</Text>
+                      </FormErrorText>
+                    )}
+                  </FormControl>
+
                   <FormControl id="jobLink" className="job-info__form-control">
                     <FormLabel>Link to Job</FormLabel>
                     <Input
                       type="url"
-                      required
                       value={jobLink}
+                      onBlur={handleBlur}
                       onChange={handleChange}
                       // id="jobLink"
                       placeholder="Link to Job Post"
                     />
-                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                    {errors.jobLink && touched.jobLink && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.jobLink}</Text>
+                      </FormErrorText>
+                    )}
                   </FormControl>
 
                   <FormControl id="location" className="job-info__form-control">
                     <FormLabel>Location</FormLabel>
                     <Input
                       type="text"
-                      required
                       value={location}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       placeholder="Job Location"
                     />
+                    {errors.location && touched.location && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.location}</Text>
+                      </FormErrorText>
+                    )}
                   </FormControl>
                 </Flex>
 
@@ -290,13 +343,19 @@ const Index = ({
                     <FormLabel>Company Name</FormLabel>
                     <Input
                       type="text"
-                      required
                       value={companyName}
+                      onBlur={handleBlur}
                       onChange={handleChange}
                       placeholder="Enter company name"
                       id="companyName"
                     />
+                    {errors.companyName && touched.companyName && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.companyName}</Text>
+                      </FormErrorText>
+                    )}
                   </FormControl>
+
                   <FormControl
                     id="companySite"
                     className="job-info__form-control"
@@ -306,9 +365,15 @@ const Index = ({
                       type="url"
                       id="companySite"
                       value={companySite}
+                      onBlur={handleBlur}
                       onChange={handleChange}
                       placeholder="Company website"
                     />
+                    {errors.companySite && touched.companySite && (
+                      <FormErrorText>
+                        <Text mb={0}>{errors.companySite}</Text>
+                      </FormErrorText>
+                    )}
                   </FormControl>
                 </Flex>
 
@@ -317,7 +382,6 @@ const Index = ({
                   variant="solid"
                   isLoading={isSubmitting}
                   loadingText="Submitting"
-                  // onClick={handleSubmit}
                   bgColor="purple.500"
                   color="white"
                   _hover={{ bgColor: "purple.400" }}

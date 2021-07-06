@@ -8,3 +8,4 @@ export * from "./boards";
 export * from "./board-card";
 export * from "./footer";
 export * from "./bottom-sheet-modal";
+export * from "./form-error-text";
