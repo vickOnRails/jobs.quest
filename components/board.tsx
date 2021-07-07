@@ -28,9 +28,11 @@ export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
 
   return (
     <StyledBoard bg={colorMode === "light" ? "gray.100" : "gray.900"}>
-      <Heading as="h3">{title}</Heading>
+      <Heading as="h3">
+        {title} <small>{jobs.size}</small>
+      </Heading>
 
-      {jobs.map((job, idx) => (
+      {Array.from(jobs).map((job: any, idx: any) => (
         <BoardCard job={job} key={idx} />
       ))}
     </StyledBoard>

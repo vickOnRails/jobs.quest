@@ -5,6 +5,7 @@ import { DefaultUser, Session } from "next-auth";
 import { Button, Flex, useToast } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
+import { useQuery } from "react-query";
 
 import {
   Layout,
@@ -16,6 +17,7 @@ import {
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
 import { TCreateJobBody } from "../api/jobs";
+import { getJobs } from "../../utils/services/get-jobs";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -36,22 +38,22 @@ export const RootAppContext = createContext<AppContextProps | null>(null);
 // this structure will get filled when the jobs data come in
 const jobBoards: IBoard[] = [
   {
-    jobs: [],
+    jobs: new Set(),
     title: "Saved",
     name: ApplicationStage.SAVED,
   },
   {
-    jobs: [],
+    jobs: new Set(),
     title: "Preparing",
     name: ApplicationStage.PREPARING,
   },
   {
-    jobs: [],
+    jobs: new Set(),
     title: "Applied",
     name: ApplicationStage.APPLIED,
   },
   {
-    jobs: [],
+    jobs: new Set(),
     title: "Interviewing",
     name: ApplicationStage.INTERVIEWING,
   },
@@ -67,7 +69,8 @@ const initialValues: TCreateJobBody = {
   companySite: "",
 };
 export interface IBoard {
-  jobs: Job[];
+  // jobs: Job[];
+  jobs: any;
   title: string;
   name: string;
 }
@@ -77,7 +80,7 @@ export interface IBoard {
  */
 const Index = ({
   session,
-  jobs,
+  jobs: initialJobsData,
   error,
 }: {
   session: User;
@@ -86,11 +89,24 @@ const Index = ({
 }) => {
   const { user } = session;
 
+  // const [jobBoards, setJobBoards] = useState(initialJobBoards);
+
+  // @ts-ignore
+  const { data, refetch } = useQuery<Job[]>("jobs", getJobs, {
+    initialData: {
+      jobs: initialJobsData,
+    },
+    refetchOnMount: true,
+  });
+
+  // @ts-ignore
+  const { jobs } = data;
+
   // state controlling modal for job info
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
 
   // quick fix for when useEffect doesnt run on the client side
-  const [jobsLoaded, setJobsLoaded] = useState(false);
+  // const [jobsLoaded, setJobsLoaded] = useState(false);
 
   const toggleJobInfoModal = () => {
     setJobInfoModalOpen(!jobInfoModalOpen);
@@ -101,19 +117,22 @@ const Index = ({
   if (error) return <p>{error}</p>;
 
   useEffect(() => {
+    // setJobBoards(initialJobBoards);
+
     // This is a fix for the useEffect not running on the client
     // run this function only when jobsLoaded changes (Technically only runs the once)
-    if (!jobsLoaded) {
-      const jobsLookup = jobBoards.map((board) => board.name);
+    // if (!jobsLoaded) {
 
-      jobs.map((job) => {
-        const index = jobsLookup.indexOf(job.applicationStage);
-        jobBoards[index].jobs.push(job);
-      });
+    const jobsLookup = jobBoards.map((board) => board.name);
 
-      setJobsLoaded(true);
-    }
-  }, [jobsLoaded]);
+    jobs.map((job) => {
+      const index = jobsLookup.indexOf(job.applicationStage);
+      jobBoards[index].jobs.add(job);
+    });
+
+    // setJobsLoaded(true);
+    // }
+  }, [jobs]);
 
   return (
     <Layout user={user} showHeader>
@@ -151,6 +170,8 @@ const Index = ({
               <CreateEditJob
                 initialValues={initialValues}
                 setJobInfoModalOpen={setJobInfoModalOpen}
+                refresh={refetch}
+                // setJobsLoaded={setJobsLoaded}
               />
             </BottomSheetModal>
           )}
@@ -186,8 +207,8 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   // Get all jobs
 
   try {
-    const res = await fetch(url);
-    const data = await res.json();
+    // TODO: handle error. This can break the app
+    const data = await getJobs();
 
     if (!data.success) {
       return {

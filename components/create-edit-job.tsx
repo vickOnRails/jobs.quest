@@ -60,6 +60,8 @@ const confidenceLevelOptions = Object.values(ConfidenceLevel);
 export const CreateEditJob: FC<CreateEditJobProps> = ({
   initialValues,
   setJobInfoModalOpen,
+  refresh,
+  // setJobsLoaded,
 }) => {
   const toast = useToast();
   const {
@@ -84,6 +86,8 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       try {
         const res = await createJob(values);
         if (res.ok) {
+          refresh();
+
           toast({
             title: "Job Created",
             description: "Your job has been added to the database",
@@ -91,7 +95,10 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
             duration: 1000,
             isClosable: true,
           });
-          setJobInfoModalOpen(false);
+
+          setTimeout(() => {
+            setJobInfoModalOpen(false);
+          }, 2000);
         }
       } catch (err) {
         // TODO: Handle error more robustly
@@ -233,6 +240,8 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       >
         Create Job
       </Button>
+
+      <Button onClick={refresh}>Refetch</Button>
     </StyledJobInfoForm>
   );
 };
@@ -248,6 +257,10 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
    * setJobInfoModalOpen - function for closing the modal when we're done creating/editing a job
    */
   setJobInfoModalOpen: (open: boolean) => void;
+
+  refresh: any;
+
+  // setJobsLoaded: any;
 }
 
 const StyledJobInfoForm = styled.form`
