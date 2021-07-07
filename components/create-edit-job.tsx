@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes } from "react";
+import React, { FC, FormEvent, HTMLAttributes } from "react";
 import {
   Input,
   FormLabel,
@@ -19,6 +19,7 @@ import { ConfidenceLevel } from "../types/types";
 import { TCreateJobBody } from "../pages/api/jobs";
 import { useFormik } from "formik";
 import { createJob } from "../utils/services/create-job";
+import { useMutation } from "react-query";
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
@@ -60,10 +61,42 @@ const confidenceLevelOptions = Object.values(ConfidenceLevel);
 export const CreateEditJob: FC<CreateEditJobProps> = ({
   initialValues,
   setJobInfoModalOpen,
-  refresh,
-  // setJobsLoaded,
+  refetch,
 }) => {
   const toast = useToast();
+  const { mutate: createJobMutation, isLoading } = useMutation(
+    async (evt: FormEvent) => {
+      // prevent page from reloading
+      evt.preventDefault();
+
+      // call service for creating job
+      await createJob({
+        confidenceLevel,
+        companyName,
+        companySite,
+        position,
+        location,
+        jobLink,
+      });
+
+      // show a success toast
+      toast({
+        title: "Job Created",
+        description: "Your job has been added to the database",
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+
+      // implement a react-query refetch
+      await refetch();
+
+      // close job info modal
+      setJobInfoModalOpen(false);
+    }
+  );
+
+  // setup formik
   const {
     handleChange,
     values: {
@@ -74,40 +107,17 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       location,
       jobLink,
     },
-    handleSubmit,
     errors,
     handleBlur,
-    isSubmitting,
     touched,
   } = useFormik({
     initialValues,
     validate,
-    onSubmit: async (values) => {
-      try {
-        const res = await createJob(values);
-        if (res.ok) {
-          refresh();
-
-          toast({
-            title: "Job Created",
-            description: "Your job has been added to the database",
-            status: "success",
-            duration: 1000,
-            isClosable: true,
-          });
-
-          setTimeout(() => {
-            setJobInfoModalOpen(false);
-          }, 2000);
-        }
-      } catch (err) {
-        // TODO: Handle error more robustly
-        console.log(`An error occurred: ${err.message}`);
-      }
-    },
+    onSubmit: () => {},
   });
+
   return (
-    <StyledJobInfoForm onSubmit={handleSubmit}>
+    <StyledJobInfoForm onSubmit={createJobMutation}>
       <Flex className="job-info__flex">
         <FormControl id="position" className="job-info__form-control">
           <FormLabel>Job Position</FormLabel>
@@ -158,6 +168,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
             value={jobLink}
             onBlur={handleBlur}
             onChange={handleChange}
+            name="jobLink"
             // id="jobLink"
             placeholder="Link to Job Post"
           />
@@ -231,7 +242,8 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       <Button
         type="submit"
         variant="solid"
-        isLoading={isSubmitting}
+        // isLoading={isSubmitting}
+        isLoading={isLoading}
         loadingText="Submitting"
         bgColor="purple.500"
         color="white"
@@ -240,8 +252,6 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       >
         Create Job
       </Button>
-
-      <Button onClick={refresh}>Refetch</Button>
     </StyledJobInfoForm>
   );
 };
@@ -258,7 +268,7 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
    */
   setJobInfoModalOpen: (open: boolean) => void;
 
-  refresh: any;
+  refetch: any;
 
   // setJobsLoaded: any;
 }

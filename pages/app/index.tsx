@@ -89,8 +89,6 @@ const Index = ({
 }) => {
   const { user } = session;
 
-  // const [jobBoards, setJobBoards] = useState(initialJobBoards);
-
   // @ts-ignore
   const { data, refetch } = useQuery<Job[]>("jobs", getJobs, {
     initialData: {
@@ -170,7 +168,7 @@ const Index = ({
               <CreateEditJob
                 initialValues={initialValues}
                 setJobInfoModalOpen={setJobInfoModalOpen}
-                refresh={refetch}
+                refetch={refetch}
                 // setJobsLoaded={setJobsLoaded}
               />
             </BottomSheetModal>

@@ -20,18 +20,28 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
         colorMode === "light" ? "0 0 5px 2px rgba(0,0,0,0.06)" : "none"
       }
     >
-      <Heading as="h4">{position}</Heading>
+      <Heading as="h4" className="unselectable">
+        {position}
+      </Heading>
 
       <Flex wrap="wrap" justifyContent="space-between">
         <Flex className="location" alignItems="center">
           <Map className="icon" />
-          <Text className="mb-0" color={textColorDim} fontSize="md">
+          <Text
+            className="mb-0 unselectable"
+            color={textColorDim}
+            fontSize="md"
+          >
             {location}
           </Text>
         </Flex>
         <Flex alignItems="center">
           <Clock className="icon" />
-          <Text className="mb-0" color={textColorDim} fontSize="sm">
+          <Text
+            className="mb-0 unselectable"
+            color={textColorDim}
+            fontSize="sm"
+          >
             {formatDate(date)}
           </Text>
         </Flex>
@@ -39,10 +49,14 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
           <Image
             src={`https://logo.clearbit.com/${companySite}`}
             height="20"
-            className="logo-img"
+            className="logo-img unselectable"
             width="20"
           />
-          <Text className="company-name" color={textColorDim} fontSize="sm">
+          <Text
+            className="company-name unselectable"
+            color={textColorDim}
+            fontSize="sm"
+          >
             {companyName}
           </Text>
         </Flex>

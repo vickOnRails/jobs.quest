@@ -17,6 +17,10 @@ export const GlobalStyles = () => (
         font-family: var(--chakra-fonts-heading);
       }
 
+      .unselectable {
+        user-select: none;
+      }
+
       * {
         box-sizing: border-box;
       }
