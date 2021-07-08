@@ -9,9 +9,9 @@ import { IBoard } from "../pages/app";
  */
 export const Boards: FC<BoardsProps> = ({ boards }) => {
   return (
-    <StyledBoard>
+    <StyledBoard className="custom-scrollbar">
       {boards.map((board) => (
-        <Board key={board.name} board={board} />
+        <Board key={board.name} board={board} className="custom-scrollbar" />
       ))}
     </StyledBoard>
   );
@@ -23,7 +23,7 @@ interface BoardsProps extends HTMLAttributes<HTMLElement> {
 
 const StyledBoard = styled.section`
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   max-height: 100vh;
   min-height: 60vh;
   overflow-x: auto;

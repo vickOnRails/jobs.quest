@@ -37,6 +37,33 @@ export const GlobalStyles = () => (
       p {
         margin-bottom: 1em;
       }
+
+      // style for custom scrollbar
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: inherit;
+        border-radius: var(--br-lg);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--chakra-colors-gray-300);
+        max-height: 10px;
+        border-radius: var(--br-lg);
+      }
+
+      body.chakra-ui-dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--chakra-colors-gray-700);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-button {
+        background: inherit;
+        border-radius: var(--br-lg);
+      }
     `}
   />
 );
