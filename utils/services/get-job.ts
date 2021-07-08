@@ -1,6 +1,6 @@
 import { Job } from "../../components";
 
-const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+const baseUrl = process.env.NEXTAUTH_URL;
 
 interface JobResponse extends Response {
   success: boolean;
