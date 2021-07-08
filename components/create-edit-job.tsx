@@ -15,11 +15,13 @@ import styled from "@emotion/styled";
 
 import { breakpoints } from "../theme";
 import { FormErrorText } from ".";
-import { ConfidenceLevel } from "../types/types";
+import { ApplicationStage, ConfidenceLevel } from "../types/types";
 import { TCreateJobBody } from "../pages/api/jobs";
 import { useFormik } from "formik";
 import { createJob } from "../utils/services/create-job";
 import { useMutation } from "react-query";
+import { Job } from "./board";
+import { formatDate } from "../utils";
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
@@ -53,6 +55,7 @@ const validate = (values: TCreateJobBody) => {
 };
 
 const confidenceLevelOptions = Object.values(ConfidenceLevel);
+const applicationLevelOptions = Object.values(ApplicationStage);
 
 /**
  * CreateEditJob  - Handles both creation of new jobs and editing of old ones
@@ -62,8 +65,17 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
   initialValues,
   setJobInfoModalOpen,
   refetch,
+  jobId,
 }) => {
   const toast = useToast();
+  const { handleChange, values, errors, handleBlur, touched } = useFormik({
+    initialValues,
+    validate: validate,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
   const { mutate: createJobMutation, isLoading } = useMutation(
     async (evt: FormEvent) => {
       // prevent page from reloading
@@ -96,25 +108,16 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
     }
   );
 
-  // setup formik
   const {
-    handleChange,
-    values: {
-      confidenceLevel,
-      companyName,
-      companySite,
-      position,
-      location,
-      jobLink,
-    },
-    errors,
-    handleBlur,
-    touched,
-  } = useFormik({
-    initialValues,
-    validate,
-    onSubmit: () => {},
-  });
+    confidenceLevel,
+    companyName,
+    companySite,
+    position,
+    date: dateAdded,
+    applicationStage,
+    location,
+    jobLink,
+  } = values;
 
   return (
     <StyledJobInfoForm onSubmit={createJobMutation}>
@@ -161,6 +164,27 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
           )}
         </FormControl>
 
+        {jobId && (
+          <FormControl id="applicationStage" className="job-info__form-control">
+            <FormLabel>Application Stage</FormLabel>
+            <Select
+              onChange={handleChange}
+              defaultValue={applicationStage}
+              onBlur={handleBlur}
+            >
+              {applicationLevelOptions.map((option) => {
+                return <option key={option}>{option}</option>;
+              })}
+            </Select>
+
+            {errors.confidenceLevel && touched.confidenceLevel && (
+              <FormErrorText>
+                <Text mb={0}>{errors.confidenceLevel}</Text>
+              </FormErrorText>
+            )}
+          </FormControl>
+        )}
+
         <FormControl id="jobLink" className="job-info__form-control">
           <FormLabel>Link to Job</FormLabel>
           <Input
@@ -194,6 +218,20 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
             </FormErrorText>
           )}
         </FormControl>
+
+        {jobId && (
+          <FormControl id="date" className="job-info__form-control">
+            <FormLabel>Saved At</FormLabel>
+            <Input
+              type="text"
+              value={formatDate(dateAdded)}
+              disabled
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Date Added"
+            />
+          </FormControl>
+        )}
       </Flex>
 
       <Box mb={5} mt={3}>
@@ -203,7 +241,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         <Divider />
       </Box>
 
-      <Flex>
+      <Flex className="job-info__flex">
         <FormControl id="companyName" className="job-info__form-control">
           <FormLabel>Company Name</FormLabel>
           <Input
@@ -242,7 +280,6 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       <Button
         type="submit"
         variant="solid"
-        // isLoading={isSubmitting}
         isLoading={isLoading}
         loadingText="Submitting"
         bgColor="purple.500"
@@ -250,7 +287,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         _hover={{ bgColor: "purple.400" }}
         _active={{ bgColor: "purple.400" }}
       >
-        Create Job
+        {jobId ? "Update Job" : "Create Job"}
       </Button>
     </StyledJobInfoForm>
   );
@@ -261,7 +298,7 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
    * initialValues - initial values for the form
    * Will be empty when creating new jobs and set to the job object when editing
    */
-  initialValues: TCreateJobBody;
+  initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "date">;
 
   /**
    * setJobInfoModalOpen - function for closing the modal when we're done creating/editing a job
@@ -269,6 +306,8 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
   setJobInfoModalOpen: (open: boolean) => void;
 
   refetch: any;
+
+  jobId: string | null;
 
   // setJobsLoaded: any;
 }

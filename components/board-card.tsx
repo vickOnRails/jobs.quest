@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes } from "react";
+import React, { FC, HTMLAttributes, useContext } from "react";
 import { Box, useColorMode, Heading, Text, Flex } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 import Image from "next/image";
@@ -6,10 +6,16 @@ import { Map, Clock } from "react-feather";
 
 import { Job } from "./board";
 import { formatDate } from "../utils";
+import { AppContextProps, RootAppContext } from "../pages/app";
 
 export const BoardCard: FC<BoardCardProps> = ({ job }) => {
   const { colorMode } = useColorMode();
+  const appContext = useContext<AppContextProps | null>(
+    RootAppContext
+  ) as AppContextProps;
   const { position, location, companySite, date, companyName, _id } = job;
+
+  const { toggleJobInfoModal, setJobInfoId } = appContext;
 
   const textColorDim = colorMode === "light" ? "gray.600" : "gray.500";
 
@@ -19,6 +25,10 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
       boxShadow={
         colorMode === "light" ? "0 0 5px 2px rgba(0,0,0,0.06)" : "none"
       }
+      onClick={() => {
+        setJobInfoId(_id);
+        toggleJobInfoModal();
+      }}
     >
       <Heading as="h4" className="unselectable">
         {position}

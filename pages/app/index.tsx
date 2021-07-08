@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
 import { DefaultUser, Session } from "next-auth";
-import { Button, Flex, useToast } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
 import { useQuery } from "react-query";
@@ -12,12 +12,14 @@ import {
   Container,
   Boards,
   Job,
+  Spinner,
   CreateEditJob,
   BottomSheetModal,
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
 import { TCreateJobBody } from "../api/jobs";
 import { getJobs } from "../../utils/services/get-jobs";
+import { getJob } from "../../utils/services/get-job";
 
 // Interface for user from NextAuth library
 interface User extends Session {
@@ -29,6 +31,7 @@ interface User extends Session {
 export interface AppContextProps {
   jobInfoModalOpen: boolean;
   toggleJobInfoModal: () => void;
+  setJobInfoId: (jobId: string) => void;
 }
 
 // root application context
@@ -60,9 +63,11 @@ const jobBoards: IBoard[] = [
 ];
 
 // initial form values
-const initialValues: TCreateJobBody = {
+const initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "date"> = {
   position: "",
   confidenceLevel: ConfidenceLevel.UNSELECTED,
+  applicationStage: ApplicationStage.SAVED,
+  date: Date.now(),
   location: "",
   jobLink: "",
   companyName: "",
@@ -89,19 +94,23 @@ const Index = ({
 }) => {
   const { user } = session;
 
-  // @ts-ignore
-  const { data, refetch } = useQuery<Job[]>("jobs", getJobs, {
+  // state controlling modal for job info
+  const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
+  const [jobInfoId, setJobInfoId] = useState<string | null>(null);
+
+  const { data, refetch } = useQuery<any>("jobs", getJobs, {
     initialData: {
       jobs: initialJobsData,
     },
     refetchOnMount: true,
   });
+  const { data: jobData, isLoading: isFetchingJobDataLoading } = useQuery(
+    ["job", jobInfoId],
+    () => getJob(jobInfoId)
+  );
 
-  // @ts-ignore
-  const { jobs } = data;
-
-  // state controlling modal for job info
-  const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
+  const { jobs } = data as { jobs: Job[] };
+  const formValues = jobData?.job || initialValues;
 
   // quick fix for when useEffect doesnt run on the client side
   // const [jobsLoaded, setJobsLoaded] = useState(false);
@@ -110,31 +119,29 @@ const Index = ({
     setJobInfoModalOpen(!jobInfoModalOpen);
   };
 
+  const openJobInfoModal = () => {
+    setJobInfoId(null);
+    setJobInfoModalOpen(true);
+  };
+
   // quickly ball out if we experience an error
   // TODO: handle error more robustly
   if (error) return <p>{error}</p>;
 
   useEffect(() => {
-    // setJobBoards(initialJobBoards);
-
-    // This is a fix for the useEffect not running on the client
-    // run this function only when jobsLoaded changes (Technically only runs the once)
-    // if (!jobsLoaded) {
-
     const jobsLookup = jobBoards.map((board) => board.name);
 
-    jobs.map((job) => {
+    jobs.map((job: Job) => {
       const index = jobsLookup.indexOf(job.applicationStage);
       jobBoards[index].jobs.add(job);
     });
-
-    // setJobsLoaded(true);
-    // }
   }, [jobs]);
 
   return (
     <Layout user={user} showHeader>
-      <RootAppContext.Provider value={{ jobInfoModalOpen, toggleJobInfoModal }}>
+      <RootAppContext.Provider
+        value={{ jobInfoModalOpen, toggleJobInfoModal, setJobInfoId }}
+      >
         <StyledTrackerContainer className="jb-tracker">
           <Flex direction="column">
             <Button
@@ -142,7 +149,7 @@ const Index = ({
               className="jb-tracker__add-job"
               variant="solid"
               bgColor="purple.500"
-              onClick={toggleJobInfoModal}
+              onClick={openJobInfoModal}
               alignSelf="flex-end"
               color="white"
               _hover={{
@@ -165,12 +172,16 @@ const Index = ({
               isOpen={jobInfoModalOpen}
               onClose={toggleJobInfoModal}
             >
-              <CreateEditJob
-                initialValues={initialValues}
-                setJobInfoModalOpen={setJobInfoModalOpen}
-                refetch={refetch}
-                // setJobsLoaded={setJobsLoaded}
-              />
+              {isFetchingJobDataLoading ? (
+                <Spinner />
+              ) : (
+                <CreateEditJob
+                  initialValues={formValues}
+                  setJobInfoModalOpen={setJobInfoModalOpen}
+                  refetch={refetch}
+                  jobId={jobInfoId}
+                />
+              )}
             </BottomSheetModal>
           )}
         </StyledTrackerContainer>

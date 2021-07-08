@@ -40,6 +40,12 @@ const JobSchema = new mongoose.Schema(
       enum: Object.values(ConfidenceLevel),
     },
 
+    jobLink: {
+      /* Link to the job description/site */
+      type: String,
+      required: [true, "Please provide a link to the job post"],
+    },
+
     applicationStage: {
       /* The stage of the job application*/
 
