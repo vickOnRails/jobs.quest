@@ -1,6 +1,6 @@
 import { Job } from "../../components";
 
-const baseUrl = process.env.NEXTAUTH_URL;
+const baseUrl = process.env.NEXT_PUBLIC_APP_ROOT;
 
 const url = `${baseUrl}/api/jobs`;
 

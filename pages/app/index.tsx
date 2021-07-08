@@ -201,8 +201,6 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
   const { req } = client;
   const session = await getSession({ req });
 
-  const url = `${process.env.NEXTAUTH_URL as string}/api/jobs`;
-
   // Redirect to root page if user is not authenticated
   if (!session) {
     return {
