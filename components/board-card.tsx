@@ -6,6 +6,7 @@ import { Map, Clock } from "react-feather";
 
 import { Job } from "./board";
 import { formatDate } from "../utils";
+import { ConfidenceLevelBadge } from ".";
 import { AppContextProps, RootAppContext } from "../pages/app";
 
 export const BoardCard: FC<BoardCardProps> = ({ job }) => {
@@ -13,7 +14,15 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
   const appContext = useContext<AppContextProps | null>(
     RootAppContext
   ) as AppContextProps;
-  const { position, location, companySite, date, companyName, _id } = job;
+  const {
+    position,
+    location,
+    companySite,
+    date,
+    companyName,
+    confidenceLevel,
+    _id,
+  } = job;
 
   const { toggleJobInfoModal, setJobInfoId } = appContext;
 
@@ -30,6 +39,7 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
         toggleJobInfoModal();
       }}
     >
+      <ConfidenceLevelBadge confidenceLevel={confidenceLevel} />
       <Heading as="h4" className="unselectable">
         {position}
       </Heading>

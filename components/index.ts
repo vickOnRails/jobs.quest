@@ -11,3 +11,4 @@ export * from "./bottom-sheet-modal";
 export * from "./form-error-text";
 export * from "./create-edit-job";
 export * from "./spinner";
+export * from "./confidence-level-badge";

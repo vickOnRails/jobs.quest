@@ -12,6 +12,7 @@ export const GlobalStyles = () => (
           Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 
         --br-lg: 12px;
+        --br-xl: 1000px;
         padding: 0;
         margin: 0;
         font-family: var(--chakra-fonts-heading);
