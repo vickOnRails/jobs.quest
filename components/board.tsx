@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes } from "react";
+import React, { FC, HTMLAttributes, ReactElement } from "react";
 import { Box, Flex, Heading, useColorMode } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 
@@ -22,15 +22,20 @@ export interface Job {
 /**
  * Board component
  */
-export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
+// export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
+// @ts-ignore
+export const Board = ({ board, innerRef, ...props }) => {
   const { colorMode } = useColorMode();
 
+  // @ts-ignore
   const { title, jobs } = board;
   const jobsArray = Array.from(jobs);
 
   return (
     <StyledBoard
-      bg={colorMode === "light" ? "gray.100" : "gray.900"}
+      // bg={colorMode === "light" ? "gray.100" : "gray.900"}
+      //@ts-ignore
+      ref={innerRef}
       {...props}
     >
       <Heading as="h3">
@@ -44,11 +49,11 @@ export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
   );
 };
 
-interface BoardProps extends HTMLAttributes<HTMLElement> {
-  board: IBoard;
-}
+// interface BoardProps extends HTMLAttributes<HTMLDivElement> {
+//   board: IBoard;
+// }
 
-const StyledBoard = styled(Box)`
+const StyledBoard = styled.div`
   margin-right: 1em;
   min-width: 18rem;
   height: auto;

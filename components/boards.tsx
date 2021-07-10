@@ -1,5 +1,6 @@
 import React, { FC, HTMLAttributes } from "react";
 import styled from "@emotion/styled";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 import { Board } from ".";
 import { IBoard } from "../pages/app";
@@ -9,11 +10,39 @@ import { IBoard } from "../pages/app";
  */
 export const Boards: FC<BoardsProps> = ({ boards }) => {
   return (
-    <StyledBoard className="custom-scrollbar">
-      {boards.map((board) => (
-        <Board key={board.name} board={board} className="custom-scrollbar" />
-      ))}
-    </StyledBoard>
+    <Droppable droppableId="jobs">
+      {(provided) => (
+        <div
+          className="custom-scrollbar"
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+        >
+          {boards.map((board, index) => {
+            console.log(index + 1);
+            return (
+              <Draggable
+                key={board.name}
+                draggableId={board.name}
+                index={index + 1}
+              >
+                {(provided) => (
+                  <div
+                    // board={board}
+                    className="custom-scrollbar"
+                    key={board.name}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                  >
+                    Hello World
+                  </div>
+                )}
+              </Draggable>
+            );
+          })}
+        </div>
+      )}
+    </Droppable>
   );
 };
 

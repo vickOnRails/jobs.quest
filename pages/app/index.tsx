@@ -6,6 +6,7 @@ import { Button, Flex } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
 import { useQuery } from "react-query";
+import { DragDropContext } from "react-beautiful-dnd";
 
 import {
   Layout,
@@ -177,7 +178,9 @@ const Index = ({
           </Flex>
 
           {/* render all the jobs here */}
-          <Boards boards={jobBoards} />
+          <DragDropContext>
+            <Boards boards={jobBoards} />
+          </DragDropContext>
 
           {jobInfoModalOpen && (
             <BottomSheetModal
