@@ -1,13 +1,11 @@
-import React, { FC, HTMLAttributes } from "react";
+import React, { FC } from "react";
 import styled from "@emotion/styled";
 
 import {
-  Button,
   ModalBody,
   ModalContent,
   Modal,
   ModalOverlay,
-  ModalFooter,
   ModalHeader,
   ModalCloseButton,
   ModalProps,
@@ -27,10 +25,12 @@ export const BottomSheetModal: FC<BottomSheetModal> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent
+      <StyledModalContent
         maxW="90vw"
         minH="90vh"
+        maxH="90vh"
         position="absolute"
+        overflow="auto"
         bottom="0"
         margin="0"
       >
@@ -44,7 +44,7 @@ export const BottomSheetModal: FC<BottomSheetModal> = ({
           </Button>
           <Button variant="ghost">Secondary Action</Button>
         </ModalFooter> */}
-      </ModalContent>
+      </StyledModalContent>
     </Modal>
   );
 };
@@ -52,3 +52,5 @@ export const BottomSheetModal: FC<BottomSheetModal> = ({
 interface BottomSheetModal extends ModalProps {
   title?: string;
 }
+
+const StyledModalContent = styled(ModalContent)``;

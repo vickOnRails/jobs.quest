@@ -104,6 +104,7 @@ const Index = ({
     },
     refetchOnMount: true,
   });
+
   const { data: jobData, isLoading: isFetchingJobDataLoading } = useQuery(
     ["job", jobInfoId],
     () => getJob(jobInfoId)
@@ -129,7 +130,11 @@ const Index = ({
   if (error) return <p>{error}</p>;
 
   useEffect(() => {
-    const jobsLookup = jobBoards.map((board) => board.name);
+    // reset jobs set when the data comes in
+    const jobsLookup = jobBoards.map((board) => {
+      board.jobs = new Set();
+      return board.name;
+    });
 
     jobs.map((job: Job) => {
       const index = jobsLookup.indexOf(job.applicationStage);

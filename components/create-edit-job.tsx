@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, HTMLAttributes } from "react";
+import React, { FC, FormEvent, HTMLAttributes, useEffect } from "react";
 import {
   Input,
   FormLabel,
@@ -7,6 +7,7 @@ import {
   Text,
   Divider,
   Flex,
+  Stack,
   Button,
   Select,
   useToast,
@@ -22,6 +23,7 @@ import { createJob } from "../utils/services/create-job";
 import { useMutation } from "react-query";
 import { Job } from "./board";
 import { formatDate } from "../utils";
+import { deleteJob } from "../utils/services/delete-job";
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
@@ -107,6 +109,20 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       setJobInfoModalOpen(false);
     }
   );
+
+  const {
+    mutate: deleteJobMutation,
+    isLoading: isDeleting,
+    error,
+    data,
+  } = useMutation(async (jobId: string) => {
+    await deleteJob(jobId);
+    await refetch();
+
+    // setTimeout(() => {
+    setJobInfoModalOpen(false);
+    // }, 5000);
+  });
 
   const {
     confidenceLevel,
@@ -277,18 +293,34 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         </FormControl>
       </Flex>
 
-      <Button
-        type="submit"
-        variant="solid"
-        isLoading={isLoading}
-        loadingText="Submitting"
-        bgColor="purple.500"
-        color="white"
-        _hover={{ bgColor: "purple.400" }}
-        _active={{ bgColor: "purple.400" }}
-      >
-        {jobId ? "Update Job" : "Create Job"}
-      </Button>
+      {error && <p>{JSON.stringify(error)}</p>}
+      {data && <p>{JSON.stringify(data)}</p>}
+
+      <Stack spacing={3} direction="row">
+        <Button
+          type="submit"
+          variant="solid"
+          isLoading={isLoading}
+          loadingText="Submitting"
+          bgColor="purple.500"
+          color="white"
+          _hover={{ bgColor: "purple.400" }}
+          _active={{ bgColor: "purple.400" }}
+        >
+          {jobId ? "Update Job" : "Create Job"}
+        </Button>
+        {jobId && (
+          <Button
+            variant="solid"
+            colorScheme="red"
+            loadingText="Deleting"
+            onClick={() => deleteJobMutation(jobId)}
+            isLoading={isDeleting}
+          >
+            Delete Job
+          </Button>
+        )}
+      </Stack>
     </StyledJobInfoForm>
   );
 };
