@@ -26,12 +26,18 @@ interface User extends Session {
   user: DefaultUser;
 }
 
+// type for updating the selected job when modal is open
+export type JobInfoProp = {
+  jobId: string;
+  updatedAt: string;
+};
+
 // interface for the context of the page
 // TODO: I might have to move the context to the _app.js file to wrap the whole application
 export interface AppContextProps {
   jobInfoModalOpen: boolean;
   toggleJobInfoModal: () => void;
-  setJobInfoId: (jobId: string) => void;
+  setJobInfoId: ({ jobId, updatedAt }: JobInfoProp) => void;
 }
 
 // root application context
@@ -75,6 +81,7 @@ const initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "date"> = {
 };
 export interface IBoard {
   // jobs: Job[];
+  // TODO: use appropriate type when yyou find the type for sets
   jobs: any;
   title: string;
   name: string;
@@ -96,7 +103,10 @@ const Index = ({
 
   // state controlling modal for job info
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
-  const [jobInfoId, setJobInfoId] = useState<string | null>(null);
+  // the jobInfoId state holds the id of the job and the updatedAt timestamp of the selected job
+  // the reason we're using the the updatedAt timestamp is because we want react query to refetch the job when we edit it
+  // updated is the only field we're sure is going to change on that event
+  const [jobInfoId, setJobInfoId] = useState<JobInfoProp | null>(null);
 
   const { data, refetch } = useQuery<any>("jobs", getJobs, {
     initialData: {
@@ -107,19 +117,17 @@ const Index = ({
 
   const { data: jobData, isLoading: isFetchingJobDataLoading } = useQuery(
     ["job", jobInfoId],
-    () => getJob(jobInfoId)
+    () => jobInfoId && getJob(jobInfoId.jobId)
   );
 
   const { jobs } = data as { jobs: Job[] };
   const formValues = jobData?.job || initialValues;
 
-  // quick fix for when useEffect doesnt run on the client side
-  // const [jobsLoaded, setJobsLoaded] = useState(false);
-
   const toggleJobInfoModal = () => {
     setJobInfoModalOpen(!jobInfoModalOpen);
   };
 
+  // open jobModal Info function
   const openJobInfoModal = () => {
     setJobInfoId(null);
     setJobInfoModalOpen(true);

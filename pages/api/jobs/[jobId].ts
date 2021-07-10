@@ -59,6 +59,29 @@ export default async (req: JobInfoRequest, res: NextApiResponse) => {
         });
       }
 
+    case "PUT":
+      try {
+        // find the job and update it
+        const job = await jobModel.findOneAndUpdate({ _id: jobId }, req.body, {
+          new: true,
+        });
+
+        if (!job) {
+          res.status(404);
+          throw new Error("Job not found");
+        }
+
+        return res.json({
+          success: true,
+          job,
+        });
+      } catch (err) {
+        return res.json({
+          success: false,
+          message: err.message,
+        });
+      }
+
     default:
       return;
   }

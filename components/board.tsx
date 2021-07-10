@@ -16,6 +16,7 @@ export interface Job {
   companySite?: string;
   confidenceLevel: ConfidenceLevel;
   jobLink: string;
+  updatedAt: string;
 }
 
 /**

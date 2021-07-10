@@ -24,6 +24,8 @@ import { useMutation } from "react-query";
 import { Job } from "./board";
 import { formatDate } from "../utils";
 import { deleteJob } from "../utils/services/delete-job";
+import { editJob } from "../utils/services/edit-job";
+import { JobInfoProp } from "../pages/app";
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
@@ -83,20 +85,37 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
       // prevent page from reloading
       evt.preventDefault();
 
-      // call service for creating job
-      await createJob({
-        confidenceLevel,
-        companyName,
-        companySite,
-        position,
-        location,
-        jobLink,
-      });
+      // Check for the presence of the jobId.
+      // If it's available, we know this is an edit event and we call the edit service
+      // Else we create the new job
+      jobId
+        ? await editJob(
+            {
+              confidenceLevel,
+              companyName,
+              companySite,
+              applicationStage,
+              position,
+              location,
+              jobLink,
+            },
+            jobId.jobId
+          )
+        : await createJob({
+            confidenceLevel,
+            companyName,
+            companySite,
+            position,
+            location,
+            jobLink,
+          });
 
       // show a success toast
       toast({
-        title: "Job Created",
-        description: "Your job has been added to the database",
+        title: jobId ? `Job Edited` : `Job Created`,
+        description: jobId
+          ? "Your job has been edited"
+          : "Your job has been added to the database",
         status: "success",
         duration: 1000,
         isClosable: true,
@@ -119,9 +138,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
     await deleteJob(jobId);
     await refetch();
 
-    // setTimeout(() => {
     setJobInfoModalOpen(false);
-    // }, 5000);
   });
 
   const {
@@ -301,7 +318,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
           type="submit"
           variant="solid"
           isLoading={isLoading}
-          loadingText="Submitting"
+          loadingText={jobId?.jobId ? "Updating" : "Submitting"}
           bgColor="purple.500"
           color="white"
           _hover={{ bgColor: "purple.400" }}
@@ -314,7 +331,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
             variant="solid"
             colorScheme="red"
             loadingText="Deleting"
-            onClick={() => deleteJobMutation(jobId)}
+            onClick={() => deleteJobMutation(jobId.jobId)}
             isLoading={isDeleting}
           >
             Delete Job
@@ -339,9 +356,7 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
 
   refetch: any;
 
-  jobId: string | null;
-
-  // setJobsLoaded: any;
+  jobId: JobInfoProp | null;
 }
 
 const StyledJobInfoForm = styled.form`

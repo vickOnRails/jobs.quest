@@ -21,6 +21,7 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
     date,
     companyName,
     confidenceLevel,
+    updatedAt,
     _id,
   } = job;
 
@@ -35,7 +36,7 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
         colorMode === "light" ? "0 0 5px 2px rgba(0,0,0,0.06)" : "none"
       }
       onClick={() => {
-        setJobInfoId(_id);
+        setJobInfoId({ jobId: _id, updatedAt });
         toggleJobInfoModal();
       }}
     >
