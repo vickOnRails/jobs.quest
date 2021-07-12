@@ -26,7 +26,7 @@ export const Header: FC<HeaderProps> = ({ user }) => {
       as="header"
       bg={colorMode === "dark" ? "gray.900" : "gray.100"}
     >
-      <Flex as={Container} alignItems="center">
+      <Flex as={Container} alignItems="center" fullWidth>
         {image && <Avatar src={image} className="header__avatar" />}
 
         <Heading as="h1">{name}</Heading>

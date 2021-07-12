@@ -83,7 +83,7 @@ const initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "date"> = {
 export interface IBoard {
   // jobs: Job[];
   // TODO: use appropriate type when yyou find the type for sets
-  jobs: any;
+  jobs: Set<Job>;
   title: string;
   name: string;
 }
@@ -101,8 +101,6 @@ const Index = ({
   error?: string;
 }) => {
   const { user } = session;
-
-  resetServerContext();
 
   // state controlling modal for job info
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
@@ -158,7 +156,7 @@ const Index = ({
       <RootAppContext.Provider
         value={{ jobInfoModalOpen, toggleJobInfoModal, setJobInfoId }}
       >
-        <StyledTrackerContainer className="jb-tracker">
+        <StyledTrackerContainer className="jb-tracker" fullWidth>
           <Flex direction="column">
             <Button
               leftIcon={<Plus />}
@@ -180,9 +178,8 @@ const Index = ({
           </Flex>
 
           {/* render all the jobs here */}
-          <DragDropContext>
-            <Boards boards={jobBoards} />
-          </DragDropContext>
+
+          <Boards boards={jobBoards} refetch={refetch} />
 
           {jobInfoModalOpen && (
             <BottomSheetModal

@@ -7,7 +7,9 @@ import { TCreateJobBody } from "../../pages/api/jobs";
  */
 
 export const editJob = async (
-  values: TCreateJobBody & Pick<Job, "applicationStage">,
+  values:
+    | (TCreateJobBody & Pick<Job, "applicationStage">)
+    | Pick<Job, "applicationStage">,
   jobId: string
 ): Promise<Response> => {
   // return a promise

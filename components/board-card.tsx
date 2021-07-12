@@ -9,7 +9,7 @@ import { formatDate } from "../utils";
 import { ConfidenceLevelBadge } from ".";
 import { AppContextProps, RootAppContext } from "../pages/app";
 
-export const BoardCard: FC<BoardCardProps> = ({ job }) => {
+export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
   const { colorMode } = useColorMode();
   const appContext = useContext<AppContextProps | null>(
     RootAppContext
@@ -32,6 +32,8 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
   return (
     <StyledBoardCard
       bgColor={colorMode === "light" ? "white" : "gray.800"}
+      {...props}
+      ref={innerRef}
       boxShadow={
         colorMode === "light" ? "0 0 5px 2px rgba(0,0,0,0.06)" : "none"
       }
@@ -87,7 +89,15 @@ export const BoardCard: FC<BoardCardProps> = ({ job }) => {
 };
 
 interface BoardCardProps extends HTMLAttributes<HTMLElement> {
+  /**
+   * job - job to render
+   */
   job: Job;
+
+  /**
+   * innerRef - ref to the inner element
+   */
+  innerRef: (ref: any) => void;
 }
 
 const StyledBoardCard = styled(Box)`
