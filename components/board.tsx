@@ -24,7 +24,7 @@ export interface Job {
  */
 // export const Board: FC<BoardProps> = ({ children, board, ...props }) => {
 // @ts-ignore
-export const Board = ({ board, innerRef, ...props }) => {
+export const Board: FC<BoardProps> = ({ board, innerRef, ...props }) => {
   const { colorMode } = useColorMode();
 
   // @ts-ignore
@@ -33,10 +33,9 @@ export const Board = ({ board, innerRef, ...props }) => {
 
   return (
     <StyledBoard
-      // bg={colorMode === "light" ? "gray.100" : "gray.900"}
-      //@ts-ignore
-      ref={innerRef}
+      bg={colorMode === "light" ? "gray.100" : "gray.900"}
       {...props}
+      ref={innerRef}
     >
       <Heading as="h3">
         {title} <small>{jobs.size}</small>
@@ -49,11 +48,12 @@ export const Board = ({ board, innerRef, ...props }) => {
   );
 };
 
-// interface BoardProps extends HTMLAttributes<HTMLDivElement> {
-//   board: IBoard;
-// }
+interface BoardProps extends HTMLAttributes<HTMLDivElement> {
+  board: IBoard;
+  innerRef: (ref: any) => void;
+}
 
-const StyledBoard = styled.div`
+const StyledBoard = styled(Box)`
   margin-right: 1em;
   min-width: 18rem;
   height: auto;

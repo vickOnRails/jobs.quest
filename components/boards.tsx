@@ -12,13 +12,12 @@ export const Boards: FC<BoardsProps> = ({ boards }) => {
   return (
     <Droppable droppableId="jobs">
       {(provided) => (
-        <div
+        <StyledBoard
           className="custom-scrollbar"
           {...provided.droppableProps}
           ref={provided.innerRef}
         >
           {boards.map((board, index) => {
-            console.log(index + 1);
             return (
               <Draggable
                 key={board.name}
@@ -26,21 +25,28 @@ export const Boards: FC<BoardsProps> = ({ boards }) => {
                 index={index + 1}
               >
                 {(provided) => (
-                  <div
-                    // board={board}
+                  // <p
+                  //   className="custom-scrollbar"
+                  //   key={board.name}
+                  //   {...provided.draggableProps}
+                  //   {...provided.dragHandleProps}
+                  //   ref={provided.innerRef}
+                  // >
+                  //   ${`Hello There ${index}`}
+                  // </p>
+                  <Board
+                    board={board}
                     className="custom-scrollbar"
                     key={board.name}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                  >
-                    Hello World
-                  </div>
+                    innerRef={provided.innerRef}
+                  />
                 )}
               </Draggable>
             );
           })}
-        </div>
+        </StyledBoard>
       )}
     </Droppable>
   );

@@ -6,7 +6,7 @@ import { Button, Flex } from "@chakra-ui/react";
 import { Plus } from "react-feather";
 import styled from "@emotion/styled";
 import { useQuery } from "react-query";
-import { DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext, resetServerContext } from "react-beautiful-dnd";
 
 import {
   Layout,
@@ -101,6 +101,8 @@ const Index = ({
   error?: string;
 }) => {
   const { user } = session;
+
+  resetServerContext();
 
   // state controlling modal for job info
   const [jobInfoModalOpen, setJobInfoModalOpen] = useState(false);
