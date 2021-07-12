@@ -13,7 +13,7 @@ import { useMutation } from "react-query";
 import { Job } from "./board";
 import { ApplicationStage } from "../types/types";
 import { editJob } from "../utils/services/edit-job";
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, useColorMode, useToast } from "@chakra-ui/react";
 
 /**
  * Board component
@@ -21,6 +21,7 @@ import { Box, useToast } from "@chakra-ui/react";
 
 export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
   const toast = useToast();
+  const { colorMode } = useColorMode();
 
   // mutation for changing the job application stage
   const { mutate: moveJobStageMutation, isLoading } = useMutation(
@@ -94,7 +95,10 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
     <DragDropContext onDragEnd={onDragEnd}>
       <StyledBoard className="custom-scrollbar">
         {isLoading ? (
-          <Box className="loading" bg="gray.50">
+          <Box
+            className="loading"
+            bg={colorMode === "light" ? "gray.50" : "gray.900"}
+          >
             <Spinner loadingText="Updating..." className="spinner" />
           </Box>
         ) : (
