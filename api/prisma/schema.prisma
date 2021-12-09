@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/jobsQuest?schema=public"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Job {
+  id String @id @default(uuid())
+
+  companyName String
+  title String
+  confidenceLevel ConfidenceLevel?
+  applicationStage ApplicationStage?
+  postedAt DateTime?
+  expiringAt DateTime?
+  appliedAt DateTime?
+
+  link String
+  companyWebsite String?
+
+  jobLocation String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model User {
+  id String @id @unique @default(uuid())
+  fullname String
+  email String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  accountVerified Boolean? @default(false)
+}
+
+enum ConfidenceLevel {
+  UNSELECTED
+  FAIR_ATTEMPT
+  OPTIMISTIC
+  FAIRLY_CONFIDENT
+  CONFIDENT
+  HIGHLY_CONFIDENT
+}
+
+enum ApplicationStage {
+  SAVED
+  PREPARING
+  APPLIED
+  INTERVIEWING
+  REJECTED
+  ARCHIVED 
+  NEGOTIATING 
+  OFFER_ACCEPTED
+  OFFER_REJECTED 
+}
+
