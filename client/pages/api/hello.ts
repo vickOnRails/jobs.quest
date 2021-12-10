@@ -6,13 +6,13 @@ import { dbConnect } from "../../utils";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   await dbConnect();
-  const session = await getSession({ req });
+  // const session = await getSession({ req });
 
-  if (!session) {
-    return res.status(401).json({
-      message: "Not Authorized",
-    });
-  }
+  // if (!session) {
+  //   return res.status(401).json({
+  //     message: "Not Authorized",
+  //   });
+  // }
 
   res.status(200).json({ name: "John Doe" });
 };

@@ -8,13 +8,13 @@ import { ApplicationStage, ConfidenceLevel } from "../types/types";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 
 export interface Job {
-  _id: string;
-  position: string;
-  location: string;
-  date: number;
+  id: string;
+  title: string;
+  jobLocation: string;
+  createdAt: number;
   companyName: string;
   applicationStage: ApplicationStage;
-  companySite?: string;
+  companyWebsite?: string;
   confidenceLevel: ConfidenceLevel;
   jobLink: string;
   updatedAt: string;
@@ -51,7 +51,7 @@ export const Board: FC<BoardProps> = ({ board, className, ...props }) => {
             ref={provided.innerRef}
           >
             {jobsArray.map((job: any, idx: any) => (
-              <Draggable key={job._id} draggableId={job._id} index={idx + 1}>
+              <Draggable key={job.id} draggableId={job.id} index={idx + 1}>
                 {(provided) => (
                   <BoardCard
                     job={job}

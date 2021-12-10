@@ -13,6 +13,7 @@ export default async (
     const newJob = await prisma.job.create({
       data: {
         ...job,
+        applicationStage: "SAVED",
       },
     });
 

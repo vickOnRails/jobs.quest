@@ -15,14 +15,14 @@ export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
     RootAppContext
   ) as AppContextProps;
   const {
-    position,
-    location,
-    companySite,
-    date,
+    title,
+    jobLocation,
+    companyWebsite,
+    createdAt,
     companyName,
     confidenceLevel,
     updatedAt,
-    _id,
+    id,
   } = job;
 
   const { toggleJobInfoModal, setJobInfoId } = appContext;
@@ -38,26 +38,30 @@ export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
         colorMode === "light" ? "0 0 5px 2px rgba(0,0,0,0.06)" : "none"
       }
       onClick={() => {
-        setJobInfoId({ jobId: _id, updatedAt });
+        setJobInfoId({ jobId: id, updatedAt });
         toggleJobInfoModal();
       }}
     >
-      <ConfidenceLevelBadge confidenceLevel={confidenceLevel} />
+      {confidenceLevel && (
+        <ConfidenceLevelBadge confidenceLevel={confidenceLevel} />
+      )}
       <Heading as="h4" className="unselectable">
-        {position}
+        {title}
       </Heading>
 
       <Flex wrap="wrap" justifyContent="space-between">
-        <Flex className="location" alignItems="center">
-          <Map className="icon" />
-          <Text
-            className="mb-0 unselectable"
-            color={textColorDim}
-            fontSize="md"
-          >
-            {location}
-          </Text>
-        </Flex>
+        {jobLocation && (
+          <Flex className="location" alignItems="center">
+            <Map className="icon" />
+            <Text
+              className="mb-0 unselectable"
+              color={textColorDim}
+              fontSize="md"
+            >
+              {jobLocation}
+            </Text>
+          </Flex>
+        )}
         <Flex alignItems="center">
           <Clock className="icon" />
           <Text
@@ -65,12 +69,12 @@ export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
             color={textColorDim}
             fontSize="sm"
           >
-            {formatDate(date)}
+            {formatDate(createdAt)}
           </Text>
         </Flex>
         <Flex alignItems="center">
           <Image
-            src={`https://logo.clearbit.com/${companySite}`}
+            src={`https://logo.clearbit.com/${companyWebsite}`}
             height="20"
             className="logo-img unselectable"
             width="20"

@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { ConfidenceLevel } from "../types/types";
 
 const generateClassName = (confidenceLevel: ConfidenceLevel) => {
-  return confidenceLevel.toLowerCase().replaceAll(" ", "-");
+  return confidenceLevel && confidenceLevel.toLowerCase().replaceAll(" ", "-");
 };
 
 const appendConfidenceLevelEmoji = (confidenceLevel: ConfidenceLevel) => {

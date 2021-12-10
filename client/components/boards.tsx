@@ -25,17 +25,14 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
 
   // mutation for changing the job application stage
   const { mutate: moveJobStageMutation, isLoading } = useMutation(
-    async ({
-      _id,
-      applicationStage,
-    }: Pick<Job, "_id" | "applicationStage">) => {
+    async ({ id, applicationStage }: Pick<Job, "id" | "applicationStage">) => {
       toast({
         title: `Updating...`,
         status: "info",
       });
 
       // run the editJob service
-      await editJob({ applicationStage: applicationStage }, _id);
+      await editJob({ applicationStage: applicationStage }, id);
 
       // close loading state toasts
       toast.closeAll();
@@ -70,7 +67,7 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
       for (let board of boards) {
         Array.from(board.jobs).map((job) => {
           // If we ever find the job we are dragging
-          if (job._id === draggableId) {
+          if (job.id === draggableId) {
             // delete it and re-add it to the new board
             tempJob = job;
             storedCount = count;
@@ -85,7 +82,7 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
 
       // run mutation
       moveJobStageMutation({
-        _id: draggableId,
+        id: draggableId,
         applicationStage: destination?.droppableId as ApplicationStage,
       });
     }

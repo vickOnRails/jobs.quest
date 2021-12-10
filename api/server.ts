@@ -26,7 +26,8 @@ export type ApolloServerContext = Context<{
 async function startServer(typeDefs: any, resolvers: any) {
   const app = express();
 
-  app.use(cors({ origin: "https://job-quest.app" }));
+  // app.use(cors({ origin: "https://job-quest.app" }));
+  app.use(cors({ origin: "*" }));
   const httpServer = http.createServer(app);
 
   // create the server
