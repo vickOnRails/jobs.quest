@@ -1,3 +1,6 @@
+import { gql } from "graphql-request";
+import { graphqlClient } from "../../pages/_app";
+
 import { Job } from "../../components";
 import { TCreateJobBody } from "../../pages/api/jobs";
 
@@ -6,6 +9,24 @@ import { TCreateJobBody } from "../../pages/api/jobs";
  * values - Value of jobs to be replaced
  */
 
+const EDIT_JOB = gql`
+  mutation updateJob($updateJobId: ID!, $job: UpdateJobInput!) {
+    updateJob(id: $updateJobId, job: $job) {
+      id
+      appliedAt
+      companyName
+      title
+      applicationStage
+      companyWebsite
+      confidenceLevel
+      createdAt
+      expiringAt
+      jobLocation
+      link
+      postedAt
+    }
+  }
+`;
 export const editJob = async (
   values:
     | (TCreateJobBody & Pick<Job, "applicationStage">)
@@ -15,16 +36,23 @@ export const editJob = async (
   // return a promise
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await fetch(`/api/jobs/${jobId}`, {
-        body: JSON.stringify(values),
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      // const res = await fetch(`/api/jobs/${jobId}`, {
+
+      const res = await graphqlClient.request(EDIT_JOB, {
+        updateJobId: jobId,
+        job: values,
       });
 
+      // fetch(`/api/jobs/${jobId}`, {
+      //   body: JSON.stringify(values),
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
+
       // resolve promise if API call is successful
-      if (res.ok) {
+      if (res) {
         resolve(res);
       } else {
         throw new Error(res.statusText);

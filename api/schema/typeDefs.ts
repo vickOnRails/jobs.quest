@@ -26,6 +26,17 @@ const typeDefs = gql`
     title: String!
     link: String!
     jobLocation: String!
+    confidenceLevel: ConfidenceLevel
+    companyWebsite: String
+  }
+
+  enum ConfidenceLevel {
+    UNSELECTED
+    FAIR_ATTEMPT
+    OPTIMISTIC
+    FAIRLY_CONFIDENT
+    CONFIDENT
+    HIGHLY_CONFIDENT
   }
 
   input UpdateJobInput {

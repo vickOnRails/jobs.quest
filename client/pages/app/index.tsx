@@ -1,7 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { getSession } from "next-auth/client";
 import { GetServerSideProps } from "next";
-import { gql } from "@apollo/client";
 import { DefaultUser, Session } from "next-auth";
 import { Button, Flex } from "@chakra-ui/react";
 import { Plus } from "react-feather";
@@ -19,7 +18,7 @@ import {
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
 import { TCreateJobBody } from "../api/jobs";
-import { getJobsLegacy, getJobs } from "../../utils/services/get-jobs";
+import { getJobs } from "../../utils/services/get-jobs";
 import { getJob } from "../../utils/services/get-job";
 
 // Interface for user from NextAuth library
@@ -67,19 +66,24 @@ const jobBoards: IBoard[] = [
     title: "Interviewing",
     name: ApplicationStage.INTERVIEWING,
   },
+  {
+    jobs: new Set(),
+    title: "Negotiating",
+    name: ApplicationStage.NEGOTIATING,
+  },
 ];
 
 // initial form values
 const initialValues: TCreateJobBody &
   Pick<Job, "applicationStage" | "createdAt"> = {
-  position: "",
+  title: "",
   confidenceLevel: ConfidenceLevel.UNSELECTED,
   applicationStage: ApplicationStage.SAVED,
   createdAt: Date.now(),
-  location: "",
-  jobLink: "",
+  jobLocation: "",
+  link: "",
   companyName: "",
-  companySite: "",
+  companyWebsite: "",
 };
 export interface IBoard {
   // jobs: Job[];
@@ -110,7 +114,7 @@ const Index = ({
   // updated is the only field we're sure is going to change on that event
   const [jobInfoId, setJobInfoId] = useState<JobInfoProp | null>(null);
 
-  const { data, refetch } = useQuery<any>("jobs", getJob, {
+  const { data, refetch } = useQuery<any>("jobs", getJobs, {
     initialData: {
       jobs: initialJobsData,
     },
@@ -118,11 +122,10 @@ const Index = ({
   });
 
   const { data: jobData, isLoading: isFetchingJobDataLoading } = useQuery(
+    // this is where the bulk of the job info caching happens
     ["job", jobInfoId],
     () => jobInfoId && getJob(jobInfoId.jobId)
   );
-
-  // console.log({ data, jobData });
 
   const { jobs } = data as { jobs: Job[] };
   const formValues = jobData?.job || initialValues;
@@ -148,15 +151,11 @@ const Index = ({
       return board.name;
     });
 
-    // console.log({ jobsLookup });
-
     jobs.map((job: Job) => {
       const index = jobsLookup.indexOf(job.applicationStage);
       jobBoards[index].jobs.add(job);
     });
   }, [jobs]);
-
-  // console.log({ jobBoards });
 
   return (
     <Layout user={user} showHeader>
@@ -237,7 +236,7 @@ export const getServerSideProps: GetServerSideProps = async (client) => {
 
   try {
     // TODO: handle error. This can break the app
-    const data = await getJobs(session.user?.email as string);
+    const data = await getJobs();
 
     const { jobs } = data;
 

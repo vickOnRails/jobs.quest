@@ -7,11 +7,11 @@ import { Job as TJob } from "../../../components";
 export type TCreateJobBody = Pick<
   TJob,
   | "companyName"
-  | "location"
-  | "position"
-  | "companySite"
+  | "jobLocation"
+  | "title"
+  | "companyWebsite"
   | "confidenceLevel"
-  | "jobLink"
+  | "link"
 >;
 interface JobRequest extends NextApiRequest {
   body: TCreateJobBody;

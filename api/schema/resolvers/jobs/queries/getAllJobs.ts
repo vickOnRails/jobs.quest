@@ -14,8 +14,6 @@ export const getAllJobs = async (
       where: { email: user.email },
     });
 
-    console.log({ userFromDb });
-
     if (!userFromDb)
       throw new Error("You have to be authenticated to see this page");
 

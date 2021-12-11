@@ -83,7 +83,8 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
       // run mutation
       moveJobStageMutation({
         id: draggableId,
-        applicationStage: destination?.droppableId as ApplicationStage,
+        applicationStage:
+          destination?.droppableId.toUpperCase() as ApplicationStage,
       });
     }
   };

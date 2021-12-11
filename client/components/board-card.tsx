@@ -63,14 +63,18 @@ export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
           </Flex>
         )}
         <Flex alignItems="center">
-          <Clock className="icon" />
-          <Text
-            className="mb-0 unselectable"
-            color={textColorDim}
-            fontSize="sm"
-          >
-            {formatDate(createdAt)}
-          </Text>
+          {createdAt && (
+            <>
+              <Clock className="icon" />
+              <Text
+                className="mb-0 unselectable"
+                color={textColorDim}
+                fontSize="sm"
+              >
+                {formatDate(createdAt)}
+              </Text>
+            </>
+          )}
         </Flex>
         <Flex alignItems="center">
           <Image

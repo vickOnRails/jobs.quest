@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, HTMLAttributes, useEffect } from "react";
+import React, { FC, FormEvent, HTMLAttributes } from "react";
 import {
   Input,
   FormLabel,
@@ -29,24 +29,17 @@ import { JobInfoProp } from "../pages/app";
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
-  const {
-    position,
-    companySite,
-    location,
-    companyName,
-    confidenceLevel,
-    jobLink,
-  } = values;
+  const { title, companyWebsite, companyName, confidenceLevel, link } = values;
 
   const errors: any = {};
 
-  if (!position) {
+  if (!title) {
     errors.position = "Job position is a required field";
   }
 
-  if (!companySite) errors.companySite = "Company site is a required field";
+  if (!companyWebsite) errors.companySite = "Company site is a required field";
   if (!companyName) errors.companyName = "Company Name is a required field";
-  if (!jobLink) errors.jobLink = "Job Link is a required field";
+  if (!link) errors.link = "Job Link is a required field";
   if (!location) errors.location = "Location is a required field";
 
   if (!confidenceLevel) {
@@ -75,9 +68,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
   const { handleChange, values, errors, handleBlur, touched } = useFormik({
     initialValues,
     validate: validate,
-    onSubmit: (values) => {
-      console.log(values);
-    },
+    onSubmit: (values) => {},
   });
 
   const { mutate: createJobMutation, isLoading } = useMutation(
@@ -93,21 +84,21 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
             {
               confidenceLevel,
               companyName,
-              companySite,
+              companyWebsite,
               applicationStage,
-              position,
-              location,
-              jobLink,
+              title,
+              jobLocation,
+              link,
             },
             jobId.jobId
           )
         : await createJob({
             confidenceLevel,
             companyName,
-            companySite,
-            position,
-            location,
-            jobLink,
+            companyWebsite,
+            title,
+            jobLocation,
+            link,
           });
 
       // show a success toast
@@ -144,30 +135,30 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
   const {
     confidenceLevel,
     companyName,
-    companySite,
-    position,
-    date: dateAdded,
+    companyWebsite,
+    title,
+    createdAt: dateAdded,
     applicationStage,
-    location,
-    jobLink,
+    jobLocation,
+    link,
   } = values;
 
   return (
     <StyledJobInfoForm onSubmit={createJobMutation}>
       <Flex className="job-info__flex">
-        <FormControl id="position" className="job-info__form-control">
+        <FormControl id="title" className="job-info__form-control">
           <FormLabel>Job Position</FormLabel>
           <Input
             type="text"
             placeholder="Job Position"
-            value={position}
+            value={title}
             onBlur={handleBlur}
             onChange={handleChange}
           />
 
-          {errors.position && touched.position && (
+          {errors.title && touched.title && (
             <FormErrorText>
-              <Text mb={0}>{errors.position}</Text>
+              <Text mb={0}>{errors.title}</Text>
             </FormErrorText>
           )}
         </FormControl>
@@ -218,42 +209,42 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
           </FormControl>
         )}
 
-        <FormControl id="jobLink" className="job-info__form-control">
+        <FormControl id="link" className="job-info__form-control">
           <FormLabel>Link to Job</FormLabel>
           <Input
             type="url"
-            value={jobLink}
+            value={link}
             onBlur={handleBlur}
             onChange={handleChange}
-            name="jobLink"
+            // name="jobLink"
             // id="jobLink"
             placeholder="Link to Job Post"
           />
-          {errors.jobLink && touched.jobLink && (
+          {errors.link && touched.link && (
             <FormErrorText>
-              <Text mb={0}>{errors.jobLink}</Text>
+              <Text mb={0}>{errors.link}</Text>
             </FormErrorText>
           )}
         </FormControl>
 
-        <FormControl id="location" className="job-info__form-control">
+        <FormControl id="jobLocation" className="job-info__form-control">
           <FormLabel>Location</FormLabel>
           <Input
             type="text"
-            value={location}
+            value={jobLocation}
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder="Job Location"
           />
-          {errors.location && touched.location && (
+          {errors.jobLocation && touched.jobLocation && (
             <FormErrorText>
-              <Text mb={0}>{errors.location}</Text>
+              <Text mb={0}>{errors.jobLocation}</Text>
             </FormErrorText>
           )}
         </FormControl>
 
         {jobId && (
-          <FormControl id="date" className="job-info__form-control">
+          <FormControl id="createdAt" className="job-info__form-control">
             <FormLabel>Saved At</FormLabel>
             <Input
               type="text"
@@ -292,19 +283,18 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
           )}
         </FormControl>
 
-        <FormControl id="companySite" className="job-info__form-control">
+        <FormControl id="companyWebsite" className="job-info__form-control">
           <FormLabel>Company Site</FormLabel>
           <Input
             type="url"
-            id="companySite"
-            value={companySite}
+            value={companyWebsite}
             onBlur={handleBlur}
             onChange={handleChange}
             placeholder="Company website"
           />
-          {errors.companySite && touched.companySite && (
+          {errors.companyWebsite && touched.companyWebsite && (
             <FormErrorText>
-              <Text mb={0}>{errors.companySite}</Text>
+              <Text mb={0}>{errors.companyWebsite}</Text>
             </FormErrorText>
           )}
         </FormControl>
@@ -347,7 +337,7 @@ interface CreateEditJobProps extends HTMLAttributes<HTMLFormElement> {
    * initialValues - initial values for the form
    * Will be empty when creating new jobs and set to the job object when editing
    */
-  initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "date">;
+  initialValues: TCreateJobBody & Pick<Job, "applicationStage" | "createdAt">;
 
   /**
    * setJobInfoModalOpen - function for closing the modal when we're done creating/editing a job
