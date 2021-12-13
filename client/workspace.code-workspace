@@ -1,0 +1,11 @@
+{
+  "folders": [
+	{
+		"name": "jobs.quest",
+		"path": ".."
+	}
+],
+  "settings": {
+    "git.ignoreLimitWarning": true
+  }
+}
