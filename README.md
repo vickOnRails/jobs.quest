@@ -7,7 +7,7 @@ Jobs.quest is an open source, self hosted app to track and manage all your job a
 Here's a few exciting features
 
 - 😅 Switch to an easier way to manage your job applications
-- 👌🏼 It's open source and you can host it yourself, anywhere (https://github.com/vickOnRails/job.quest)
+- 👌🏼 It's open source and you can host it yourself, anywhere
 - 🚀 One click deploy to (Vercel, Netlify, AWS)
 - 🎨Customize your version as you desire
 - 🙋🏼‍♂️ Built in public. Suggest features and they'll be added
