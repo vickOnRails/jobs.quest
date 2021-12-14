@@ -20,22 +20,13 @@ export const createJob = async (values: TCreateJobBody): Promise<Response> => {
   // return a promise
   return new Promise(async (resolve, reject) => {
     try {
-      // const res = await fetch("/api/jobs", {
-      //   body: JSON.stringify(values),
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
-      const res = graphqlClient.request(CREATE_JOB, {
+      const res = await graphqlClient.request(CREATE_JOB, {
         job: values,
       });
-      // resolve promise if API call is successful
-      if (res) {
-        resolve(res);
-      } else {
-        throw new Error(res);
-      }
+
+      if (res.error) reject(res);
+
+      if (res) resolve(res);
     } catch (err) {
       // else reject the promise
       reject(err);

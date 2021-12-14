@@ -4,36 +4,36 @@ import { Job } from "../../components";
 // import client from "../../apollo-client";
 import { graphqlClient } from "../../pages/_app";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_ROOT;
-
-const url = `${baseUrl}/api/jobs`;
-
 interface JobsResponse extends Response {
   success: boolean;
   jobs: Job[];
   message?: string;
 }
 
+const GET_JOBS = gql`
+  query GetAllJobs {
+    jobs {
+      applicationStage
+      companyName
+      appliedAt
+      companyWebsite
+      confidenceLevel
+      id
+      jobLocation
+      createdAt
+      link
+      title
+      updatedAt
+    }
+  }
+`;
+
 export const getJobs = async (): Promise<JobsResponse> => {
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await graphqlClient.request(gql`
-        query GetAllJobs {
-          jobs {
-            applicationStage
-            companyName
-            appliedAt
-            companyWebsite
-            confidenceLevel
-            id
-            jobLocation
-            createdAt
-            link
-            title
-            updatedAt
-          }
-        }
-      `);
+      const res = await graphqlClient.request(GET_JOBS);
+
+      if (res.error) reject(res);
 
       if (res) resolve(res);
     } catch (err) {

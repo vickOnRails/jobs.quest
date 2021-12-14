@@ -1,5 +1,7 @@
 import { Job } from ".prisma/client";
+import { ApolloError } from "apollo-server-errors";
 import { ApolloServerContext } from "../../../../server";
+import { EntryNotFound } from "../../../../util/entry-not-found";
 
 export default async (
   _: any,
@@ -18,5 +20,7 @@ export default async (
     });
 
     return newJob;
-  } catch (err) {}
+  } catch (err) {
+    if (err instanceof Error) throw new ApolloError(err.message);
+  }
 };

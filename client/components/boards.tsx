@@ -31,27 +31,42 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
         status: "info",
       });
 
-      // run the editJob service
-      await editJob({ applicationStage: applicationStage }, id);
+      try {
+        // run the editJob service
+        await editJob({ applicationStage: applicationStage }, id);
 
-      // close loading state toasts
-      toast.closeAll();
+        // close loading state toasts
+        toast.closeAll();
 
-      // reset entire board state
-      await refetch();
+        // reset entire board state
+        await refetch();
 
-      toast({
-        title: `Job Updated`,
-        description: `Job has been moved to the ${applicationStage} stage`,
-        status: "success",
-        duration: 1000,
-        isClosable: true,
-      });
+        toast({
+          title: `Job Updated`,
+          description: `Job has been moved to the ${applicationStage} stage`,
+          status: "success",
+          duration: 1000,
+          isClosable: true,
+        });
+        // This is a function to fix serverside rendering bug in react-beautiful-dnd
+        resetServerContext();
+      } catch (err) {
+        if (err instanceof Error) {
+          toast.closeAll();
+
+          toast({
+            title: "An error occurred",
+            status: "error",
+            // @ts-ignore
+            description: err.response && err.response.errors[0].message,
+            duration: 5000,
+            position: "bottom",
+            isClosable: true,
+          });
+        }
+      }
     }
   );
-
-  // This is a function to fix serverside rendering bug in react-beautiful-dnd
-  resetServerContext();
 
   // function to run after the onDrag event
   const onDragEnd = (result: DropResult, provided: ResponderProvided) => {

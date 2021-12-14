@@ -43,20 +43,10 @@ export const editJob = async (
         job: values,
       });
 
-      // fetch(`/api/jobs/${jobId}`, {
-      //   body: JSON.stringify(values),
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
-
       // resolve promise if API call is successful
-      if (res) {
-        resolve(res);
-      } else {
-        throw new Error(res.statusText);
-      }
+      if (res.error) reject(res);
+
+      if (res) resolve(res);
     } catch (err) {
       // else reject the promise
       reject(err);

@@ -1,3 +1,4 @@
+import { ApolloError, UserInputError } from "apollo-server-errors";
 import { ApolloServerContext } from "../../../../server";
 
 export default async (
@@ -8,10 +9,13 @@ export default async (
   const { prisma } = context;
   try {
     const { id } = args;
+
     const job = await prisma.job.delete({
       where: { id },
     });
 
     return job;
-  } catch (err) {}
+  } catch (err) {
+    if (err instanceof ApolloError) throw new UserInputError(err.message);
+  }
 };

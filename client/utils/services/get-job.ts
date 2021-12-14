@@ -43,6 +43,8 @@ export const getJob = async (
           jobId,
         });
 
+        if (res.error) reject(res);
+
         if (res) resolve(res);
       } catch (err) {
         reject(err);

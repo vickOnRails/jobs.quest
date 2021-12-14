@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, HTMLAttributes } from "react";
+import React, { useState, FC, FormEvent, HTMLAttributes } from "react";
 import {
   Input,
   FormLabel,
@@ -34,7 +34,7 @@ const validate = (values: TCreateJobBody) => {
   const errors: any = {};
 
   if (!title) {
-    errors.position = "Job position is a required field";
+    errors.title = "Job position is a required field";
   }
 
   if (!companyWebsite) errors.companySite = "Company site is a required field";
@@ -65,6 +65,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
   jobId,
 }) => {
   const toast = useToast();
+  const [submissionError, setSubmissionError] = useState("");
   const { handleChange, values, errors, handleBlur, touched } = useFormik({
     initialValues,
     validate: validate,
@@ -73,50 +74,71 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
 
   const { mutate: createJobMutation, isLoading } = useMutation(
     async (evt: FormEvent) => {
+      toast.closeAll();
       // prevent page from reloading
       evt.preventDefault();
+      setSubmissionError("");
+
+      try {
+        jobId
+          ? await editJob(
+              {
+                confidenceLevel,
+                companyName,
+                companyWebsite,
+                applicationStage,
+                title,
+                jobLocation,
+                link,
+              },
+              jobId.jobId
+            )
+          : await createJob({
+              confidenceLevel,
+              companyName,
+              companyWebsite,
+              title,
+              jobLocation,
+              link,
+            });
+
+        // show a success toast
+        toast({
+          title: jobId ? `Job Edited` : `Job Created`,
+          description: jobId
+            ? "Your job has been edited"
+            : "Your job has been added to the database",
+          status: "success",
+          duration: 1000,
+          isClosable: true,
+        });
+
+        // implement a react-query refetch
+        await refetch();
+
+        // close job info modal
+        setJobInfoModalOpen(false);
+      } catch (err) {
+        if (err instanceof Error) {
+          // @ts-ignore
+          setSubmissionError(err.response.errors[0].message);
+          toast({
+            title: "An error occurred",
+            status: "error",
+            // @ts-ignore
+            description: err.response && err.response.errors[0].message,
+            duration: 5000,
+            position: "top",
+            isClosable: true,
+          });
+        }
+        // @ts-ignore
+        // alert(err.message);
+      }
 
       // Check for the presence of the jobId.
       // If it's available, we know this is an edit event and we call the edit service
       // Else we create the new job
-      jobId
-        ? await editJob(
-            {
-              confidenceLevel,
-              companyName,
-              companyWebsite,
-              applicationStage,
-              title,
-              jobLocation,
-              link,
-            },
-            jobId.jobId
-          )
-        : await createJob({
-            confidenceLevel,
-            companyName,
-            companyWebsite,
-            title,
-            jobLocation,
-            link,
-          });
-
-      // show a success toast
-      toast({
-        title: jobId ? `Job Edited` : `Job Created`,
-        description: jobId
-          ? "Your job has been edited"
-          : "Your job has been added to the database",
-        status: "success",
-        duration: 1000,
-        isClosable: true,
-      });
-
-      // implement a react-query refetch
-      await refetch();
-
-      // close job info modal
-      setJobInfoModalOpen(false);
     }
   );
 
@@ -126,10 +148,27 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
     error,
     data,
   } = useMutation(async (jobId: string) => {
-    await deleteJob(jobId);
-    await refetch();
+    setSubmissionError("");
+    try {
+      await deleteJob(jobId);
+      await refetch();
 
-    setJobInfoModalOpen(false);
+      setJobInfoModalOpen(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        // @ts-ignore
+        setSubmissionError(err.response.errors[0].message);
+        toast({
+          title: "An error occurred",
+          status: "error",
+          // @ts-ignore
+          description: err.response && err.response.errors[0].message,
+          duration: 5000,
+          position: "top",
+          isClosable: true,
+        });
+      }
+    }
   });
 
   const {
@@ -300,8 +339,13 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         </FormControl>
       </Flex>
 
-      {error && <p>{JSON.stringify(error)}</p>}
-      {data && <p>{JSON.stringify(data)}</p>}
+      {submissionError && (
+        <Box bgColor="red.100" p="3" rounded="md" mb="3.5">
+          <Text color="red.400" fontWeight="bold" mb={0}>
+            {submissionError}
+          </Text>
+        </Box>
+      )}
 
       <Stack spacing={3} direction="row">
         <Button
@@ -311,11 +355,13 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
           loadingText={jobId?.jobId ? "Updating" : "Submitting"}
           bgColor="purple.500"
           color="white"
+          disabled={JSON.stringify(errors) !== "{}"}
           _hover={{ bgColor: "purple.400" }}
           _active={{ bgColor: "purple.400" }}
         >
           {jobId ? "Update Job" : "Create Job"}
         </Button>
+
         {jobId && (
           <Button
             variant="solid"

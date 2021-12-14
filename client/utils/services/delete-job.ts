@@ -24,12 +24,10 @@ export const deleteJob = async (jobId: string): Promise<Response> => {
         deleteJobId: jobId,
       });
 
+      if (res.error) reject(res);
+
       // resolve promise if API call is successful
-      if (res) {
-        resolve(res);
-      } else {
-        throw new Error(res.statusText);
-      }
+      if (res) resolve(res);
     } catch (err) {
       // else reject the promise
       reject(err);
