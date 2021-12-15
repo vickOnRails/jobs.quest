@@ -15,7 +15,7 @@ import client from "../apollo-client";
 const queryClient = new QueryClient();
 export const graphqlClient = new GraphQLClient("http://localhost:5000", {
   headers: {
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmNjM2JmMC0yMDRmLTQ3NmEtOGE4Ny1iZmY0OTU1YTZkYjAiLCJlbWFpbCI6InZpY3Rvcm9vZWd1MDAwOUBnbWFpbC5jb20iLCJpYXQiOjE2MzkwNjk0MzgsImV4cCI6MTY0MTY2MTQzOH0.qCU-wpueEmM1jNU6LN4FV5F5NVr4O1IeypBpu_PhLyA`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NjE3YTI2YS1iMTBlLTRhMDktYWM2Zi0wYzRkYmIwNmU5ODIiLCJlbWFpbCI6InZpY3Rvcm9vZWd1MDAwOUBnbWFpbC5jb20iLCJpYXQiOjE2Mzk1NDcyMjcsImV4cCI6MTY0MjEzOTIyN30.uEYlykdap0iXBNFmT7xWx3FTUOJvkgtLSlO5xD48hy8`,
   },
 });
 

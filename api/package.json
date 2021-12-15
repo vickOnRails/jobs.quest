@@ -4,8 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --exec ts-node ./server.ts",
-    "migrate-dev": "npx prisma migrate dev"
+    "dev": "nodemon --exec ts-node ./server.ts",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:live": "npx prisma migrate deploy",
+    "build": "rm -rf ./dist && tsc",
+    "start": "node ./dist/server.js"
   },
   "dependencies": {
     "@prisma/client": "^3.3.0",
