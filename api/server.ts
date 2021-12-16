@@ -23,6 +23,8 @@ export type ApolloServerContext = Context<{
   user?: IContextUser;
 }>;
 
+const PORT = process.env.PORT || 5000;
+
 async function startServer(typeDefs: any, resolvers: any) {
   const app = express();
 
@@ -59,10 +61,10 @@ async function startServer(typeDefs: any, resolvers: any) {
 
     // start server
     await new Promise<void>((resolve) =>
-      httpServer.listen({ port: 5000 }, resolve)
+      httpServer.listen({ port: PORT }, resolve)
     );
 
-    console.log(`Server ready at http://localhost:5000${server.graphqlPath}`);
+    console.log(`Server ready at port ${PORT}`);
   } catch (err: any) {
     console.log(err.message, err.stack);
   }
