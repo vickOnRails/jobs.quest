@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "prepare": "cd .. && husky install"
+    "start": "next start"
   },
   "dependencies": {
     "@apollo/client": "^3.5.6",
