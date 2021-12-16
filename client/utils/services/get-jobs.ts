@@ -1,7 +1,6 @@
 import { gql } from "graphql-request";
 
 import { Job } from "../../components";
-// import client from "../../apollo-client";
 import { graphqlClient } from "../../pages/_app";
 
 interface JobsResponse extends Response {

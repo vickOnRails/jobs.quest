@@ -3,7 +3,6 @@ import { Provider } from "next-auth/client";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { GraphQLClient } from "graphql-request";
 import { Hydrate } from "react-query/hydration";
-import { ApolloProvider } from "@apollo/client";
 
 import { AppProps } from "next/dist/next-server/lib/router/router";
 import { GlobalStyles } from "../components";
@@ -21,16 +20,14 @@ export const graphqlClient = new GraphQLClient(graphqlEndpoint, {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ApolloProvider client={client}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ChakraProvider theme={theme}>
-            <Provider session={pageProps.session}>
-              <GlobalStyles />
-              <Component {...pageProps} />
-            </Provider>
-          </ChakraProvider>
-        </Hydrate>
-      </ApolloProvider>
+      <Hydrate state={pageProps.dehydratedState}>
+        <ChakraProvider theme={theme}>
+          <Provider session={pageProps.session}>
+            <GlobalStyles />
+            <Component {...pageProps} />
+          </Provider>
+        </ChakraProvider>
+      </Hydrate>
     </QueryClientProvider>
   );
 }
