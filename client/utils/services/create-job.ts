@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
+import { TCreateJobBody } from "../../components";
 
-import { TCreateJobBody } from "../../pages/api/jobs";
 import { graphqlClient } from "../../pages/_app";
 
 /**

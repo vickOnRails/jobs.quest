@@ -1,8 +1,7 @@
 import { gql } from "graphql-request";
 import { graphqlClient } from "../../pages/_app";
 
-import { Job } from "../../components";
-import { TCreateJobBody } from "../../pages/api/jobs";
+import { Job, TCreateJobBody } from "../../components";
 
 /**
  * editJob - service to take care of API calls for editing a  job

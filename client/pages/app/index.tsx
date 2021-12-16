@@ -15,9 +15,9 @@ import {
   Spinner,
   CreateEditJob,
   BottomSheetModal,
+  TCreateJobBody,
 } from "../../components";
 import { ApplicationStage, ConfidenceLevel } from "../../types/types";
-import { TCreateJobBody } from "../api/jobs";
 import { getJobs } from "../../utils/services/get-jobs";
 import { getJob } from "../../utils/services/get-job";
 

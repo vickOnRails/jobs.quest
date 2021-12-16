@@ -17,7 +17,7 @@ import styled from "@emotion/styled";
 import { breakpoints } from "../theme";
 import { FormErrorText } from ".";
 import { ApplicationStage, ConfidenceLevel } from "../types/types";
-import { TCreateJobBody } from "../pages/api/jobs";
+// import { TCreateJobBody } from "../pages/api/jobs";
 import { useFormik } from "formik";
 import { createJob } from "../utils/services/create-job";
 import { useMutation } from "react-query";
@@ -26,6 +26,16 @@ import { formatDate } from "../utils";
 import { deleteJob } from "../utils/services/delete-job";
 import { editJob } from "../utils/services/edit-job";
 import { JobInfoProp } from "../pages/app";
+
+export type TCreateJobBody = Pick<
+  Job,
+  | "companyName"
+  | "jobLocation"
+  | "title"
+  | "companyWebsite"
+  | "confidenceLevel"
+  | "link"
+>;
 
 // function for validating job form
 const validate = (values: TCreateJobBody) => {
