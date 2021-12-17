@@ -11,7 +11,7 @@ generator client {
 }
 
 model Job {
-  id String @id @default(uuid())
+  id String @id @unique @default(uuid())
 
   companyName String
   title String
@@ -20,8 +20,13 @@ model Job {
   postedAt DateTime?
   expiringAt DateTime?
   appliedAt DateTime?
+  
+  owner User @relation(fields: [ownerId], references: [id])
+  ownerId String 
 
-  link String
+  notes Note[]
+
+  link String 
   companyWebsite String?
 
   jobLocation String?
@@ -34,9 +39,28 @@ model User {
   id String @id @unique @default(uuid())
   fullname String
   email String @unique
+
+  notes Note[]
+  jobs Job[]
+  
+  accountVerified Boolean? @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
-  accountVerified Boolean? @default(false)
+}
+
+model Note {
+  id String @id @unique @default(uuid())
+  body String
+
+  job Job @relation(fields: [jobId], references: [id])
+  jobId String
+
+  owner User @relation(fields: [ownerId], references: [id])
+  ownerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
 }
 
 enum ConfidenceLevel {
