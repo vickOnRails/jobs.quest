@@ -27,6 +27,11 @@ const GET_JOB = gql`
       companyWebsite
       link
       postedAt
+
+      notes {
+        id
+        body
+      }
     }
   }
 `;

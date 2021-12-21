@@ -114,14 +114,20 @@ const Index = ({
   // updated is the only field we're sure is going to change on that event
   const [jobInfoId, setJobInfoId] = useState<JobInfoProp | null>(null);
 
-  const { data, refetch } = useQuery<any>("jobs", getJobs, {
+  const { data, refetch: refetchJobs } = useQuery<any>("jobs", getJobs, {
     initialData: {
       jobs: initialJobsData,
     },
     refetchOnMount: true,
   });
 
-  const { data: jobData, isLoading: isFetchingJobDataLoading } = useQuery(
+  const {
+    data: jobData,
+    refetch: refetchJob,
+    isLoading: isFetchingJobDataLoading,
+
+    isFetched,
+  } = useQuery(
     // this is where the bulk of the job info caching happens
     ["job", jobInfoId],
     () => jobInfoId && getJob(jobInfoId.jobId)
@@ -142,6 +148,7 @@ const Index = ({
 
   // quickly ball out if we experience an error
   // TODO: handle error more robustly
+  // TODO: maybe make use of an error boundary
   if (error) return <p>{error}</p>;
 
   useEffect(() => {
@@ -185,7 +192,7 @@ const Index = ({
 
           {/* render all the jobs here */}
 
-          <Boards boards={jobBoards} refetch={refetch} />
+          <Boards boards={jobBoards} refetchJobs={refetchJobs} />
 
           {jobInfoModalOpen && (
             <BottomSheetModal
@@ -199,7 +206,8 @@ const Index = ({
                 <CreateEditJob
                   initialValues={formValues}
                   setJobInfoModalOpen={setJobInfoModalOpen}
-                  refetch={refetch}
+                  refetchJobs={refetchJobs}
+                  refetchJob={refetchJob}
                   jobId={jobInfoId}
                 />
               )}

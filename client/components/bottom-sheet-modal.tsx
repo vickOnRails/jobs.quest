@@ -30,13 +30,13 @@ export const BottomSheetModal: FC<BottomSheetModal> = ({
         minH="90vh"
         maxH="90vh"
         position="absolute"
-        overflow="auto"
+        overflow="hidden"
         bottom="0"
         margin="0"
       >
         {title && <ModalHeader>{title}</ModalHeader>}
         <ModalCloseButton />
-        <ModalBody>{children}</ModalBody>
+        <ModalBody className="modal-body">{children}</ModalBody>
 
         {/* <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
@@ -53,4 +53,11 @@ interface BottomSheetModal extends ModalProps {
   title?: string;
 }
 
-const StyledModalContent = styled(ModalContent)``;
+const StyledModalContent = styled(ModalContent)`
+  height: 100%;
+  padding-bottom: 3em;
+
+  .modal-body {
+    height: 100%;
+  }
+`;

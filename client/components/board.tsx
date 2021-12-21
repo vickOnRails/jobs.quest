@@ -7,6 +7,15 @@ import { BoardCard } from ".";
 import { ApplicationStage, ConfidenceLevel } from "../types/types";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 
+interface Note {
+  id: string;
+  body: string;
+  jobId?: string;
+  ownerId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Job {
   id: string;
   title: string;
@@ -18,6 +27,7 @@ export interface Job {
   confidenceLevel: ConfidenceLevel;
   link: string;
   updatedAt: string;
+  notes?: Note[];
 }
 
 /**

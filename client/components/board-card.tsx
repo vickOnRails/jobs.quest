@@ -22,6 +22,7 @@ export const BoardCard: FC<BoardCardProps> = ({ job, innerRef, ...props }) => {
     companyName,
     confidenceLevel,
     updatedAt,
+    notes,
     id,
   } = job;
 

@@ -19,7 +19,7 @@ import { Box, useColorMode, useToast } from "@chakra-ui/react";
  * Board component
  */
 
-export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
+export const Boards: FC<BoardsProps> = ({ boards, refetchJobs }) => {
   const toast = useToast();
   const { colorMode } = useColorMode();
 
@@ -39,7 +39,7 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
         toast.closeAll();
 
         // reset entire board state
-        await refetch();
+        await refetchJobs();
 
         toast({
           title: `Job Updated`,
@@ -132,7 +132,7 @@ export const Boards: FC<BoardsProps> = ({ boards, refetch }) => {
 
 interface BoardsProps extends HTMLAttributes<HTMLElement> {
   boards: IBoard[];
-  refetch: () => void;
+  refetchJobs: () => void;
 }
 
 const StyledBoard = styled.section`
