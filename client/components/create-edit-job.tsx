@@ -184,8 +184,6 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
     }
   });
 
-  console.log(`Working`);
-
   const {
     confidenceLevel,
     companyName,
@@ -401,7 +399,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         </form>
 
         <Box flex={1} className="notes-container">
-          <NotesContainer notes={notes} jobId={jobId} />
+          <NotesContainer notes={notes} jobId={jobId} refetchJob={refetchJob} />
         </Box>
       </Flex>
     </StyledJobInfoForm>

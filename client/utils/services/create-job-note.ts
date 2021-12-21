@@ -23,10 +23,18 @@ const CREATE_JOB_NOTE = gql`
   }
 `;
 
-export const createJobNote = async (values: JobNote): Promise<Response> => {
+interface NewNoteResponse extends Response {
+  createNote: {
+    id: string;
+    body: string;
+  };
+}
+
+export const createJobNote = async (
+  values: JobNote
+): Promise<NewNoteResponse> => {
   // return a promise
   return new Promise(async (resolve, reject) => {
-    console.log({ ...values });
     if (!values.jobId) throw new Error("Please link notes to a job");
     try {
       const res = await graphqlClient.request(CREATE_JOB_NOTE, {
