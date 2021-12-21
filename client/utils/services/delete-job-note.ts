@@ -9,7 +9,16 @@ const DELETE_JOB_NOTE = gql`
   }
 `;
 
-export const deleteJobNote = async (noteId: string): Promise<Response> => {
+interface DeleteJobNoteResponse extends Response {
+  deleteNote: {
+    id: string;
+    body: string;
+  };
+}
+
+export const deleteJobNote = async (
+  noteId: string
+): Promise<DeleteJobNoteResponse> => {
   //   return a promise
   return new Promise(async (resolve, reject) => {
     try {
