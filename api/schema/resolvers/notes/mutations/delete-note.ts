@@ -12,20 +12,22 @@ export default async (
 ) => {
   const { prisma, user } = context;
 
-  try {
-    if (!user)
-      throw new AuthenticationError(
-        "You have to be authenticated to see this page"
-      );
+  if (!user)
+    throw new AuthenticationError(
+      "You have to be authenticated to see this page"
+    );
 
+  try {
     const { id } = args;
 
-    const deletedNote = await prisma.note.deleteMany({
-      where: { ownerId: user.id, id },
+    // FIXME: cater for cases where someone else can try to delete the note
+    // only owners of notes can delete them
+    const deletedNote = await prisma.note.delete({
+      where: { id },
     });
 
     return deletedNote;
   } catch (err) {
-    if (err instanceof ApolloError) throw new UserInputError(err.message);
+    if (err instanceof ApolloError) throw new ApolloError(err.message);
   }
 };

@@ -1,20 +1,12 @@
-import React, {
-  useState,
-  FC,
-  FormEvent,
-  useEffect,
-  HTMLAttributes,
-} from "react";
+import React, { useState, FC, FormEvent, HTMLAttributes } from "react";
 import {
   Input,
   FormLabel,
   FormControl,
-  Textarea,
   Box,
   Text,
   Divider,
   Flex,
-  ButtonGroup,
   Stack,
   Button,
   Select,
@@ -86,14 +78,12 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
 }) => {
   const toast = useToast();
   const [submissionError, setSubmissionError] = useState("");
-  const [newNoteValue, setNewNoteValue] = useState("");
+
   const { handleChange, values, errors, handleBlur, touched } = useFormik({
     initialValues,
     validate: validate,
     onSubmit: (values) => {},
   });
-
-  const [newNoteMode, setNewNoteMode] = useState(false);
 
   const { mutate: createJobMutation, isLoading } = useMutation(
     async (evt: FormEvent) => {
@@ -194,35 +184,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
     }
   });
 
-  const {
-    mutate: createNoteMutation,
-    isLoading: creatingNoteLoading,
-    error: creatingNodeError,
-  } = useMutation(async (evt: FormEvent) => {
-    evt.preventDefault();
-
-    try {
-      const note = {
-        body: newNoteValue,
-      };
-      await createJobNote({ note, jobId: jobId?.jobId });
-      setNewNoteMode(false);
-      setNewNoteValue("");
-      await refetchJob();
-    } catch (err) {
-      if (err instanceof Error) {
-        toast({
-          title: "An error occurred",
-          status: "error",
-          // @ts-ignore
-          description: err.response && err.response.errors[0].message,
-          duration: 5000,
-          position: "top",
-          isClosable: true,
-        });
-      }
-    }
-  });
+  console.log(`Working`);
 
   const {
     confidenceLevel,
@@ -399,7 +361,6 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
                 </FormErrorText>
               )}
             </FormControl>
-            {JSON.stringify(notes)}
           </Flex>
 
           {submissionError && (
@@ -440,61 +401,7 @@ export const CreateEditJob: FC<CreateEditJobProps> = ({
         </form>
 
         <Box flex={1} className="notes-container">
-          <Flex alignItems="center" justifyContent="space-between" mb="4">
-            <Heading as="h4" size="md">
-              Notes
-            </Heading>
-            {!newNoteMode && (
-              <Button
-                size="sm"
-                variant="solid"
-                colorScheme="green"
-                onClick={() => setNewNoteMode(true)}
-              >
-                New
-              </Button>
-            )}
-          </Flex>
-
-          {newNoteMode && (
-            <form onSubmit={createNoteMutation}>
-              <Box>
-                <Textarea
-                  placeholder="Something important about this role..."
-                  className="notes-input"
-                  required
-                  mb="3"
-                  rows={4}
-                  value={newNoteValue}
-                  onChange={(e) => setNewNoteValue(e.target.value)}
-                ></Textarea>
-
-                <ButtonGroup spacing="3" mb="5">
-                  <Button
-                    size="sm"
-                    colorScheme="green"
-                    isLoading={creatingNoteLoading}
-                    type="submit"
-                  >
-                    Save
-                  </Button>
-                  <Button size="sm" onClick={() => setNewNoteMode(false)}>
-                    Cancel
-                  </Button>
-                </ButtonGroup>
-              </Box>
-
-              <Divider mb="4" />
-            </form>
-          )}
-
-          {/* show notes, only if job has notes */}
-          {notes && notes.length > 0 ? (
-            <NotesContainer notes={notes} />
-          ) : (
-            // hide empty note indicator if we're creating new note
-            !newNoteMode && <p>Notes do not exist. Pls add some</p>
-          )}
+          <NotesContainer notes={notes} jobId={jobId} />
         </Box>
       </Flex>
     </StyledJobInfoForm>

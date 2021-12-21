@@ -125,8 +125,6 @@ const Index = ({
     data: jobData,
     refetch: refetchJob,
     isLoading: isFetchingJobDataLoading,
-
-    isFetched,
   } = useQuery(
     // this is where the bulk of the job info caching happens
     ["job", jobInfoId],
