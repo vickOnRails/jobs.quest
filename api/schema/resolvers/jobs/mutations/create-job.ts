@@ -1,26 +1,33 @@
 import { Job } from ".prisma/client";
-import { ApolloError } from "apollo-server-errors";
+import { ApolloError, AuthenticationError } from "apollo-server-errors";
 import { ApolloServerContext } from "../../../../server";
-import { EntryNotFound } from "../../../../util/entry-not-found";
 
 export default async (
   _: any,
   args: { job: Job },
   context: ApolloServerContext
 ) => {
-  const { prisma } = context;
+  const { prisma, user } = context;
+
   try {
+    if (!user)
+      throw new AuthenticationError(
+        "You have to be authenticated to see this page"
+      );
+
     const { job } = args;
 
     const newJob = await prisma.job.create({
       data: {
         ...job,
         applicationStage: "SAVED",
+        ownerId: user?.id as string,
       },
     });
 
     return newJob;
   } catch (err) {
+    console.log(err);
     if (err instanceof Error) throw new ApolloError(err.message);
   }
 };

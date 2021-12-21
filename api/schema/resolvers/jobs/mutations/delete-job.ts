@@ -1,4 +1,8 @@
-import { ApolloError, UserInputError } from "apollo-server-errors";
+import {
+  ApolloError,
+  AuthenticationError,
+  UserInputError,
+} from "apollo-server-errors";
 import { ApolloServerContext } from "../../../../server";
 
 export default async (
@@ -6,8 +10,14 @@ export default async (
   args: { id: string },
   context: ApolloServerContext
 ) => {
-  const { prisma } = context;
+  const { prisma, user } = context;
+
   try {
+    if (!user)
+      throw new AuthenticationError(
+        "You have to be authenticated to see this page"
+      );
+
     const { id } = args;
 
     const job = await prisma.job.delete({

@@ -7,20 +7,16 @@ import cors from "cors";
 
 import { context } from "./prisma";
 import { resolvers, typeDefs } from "./schema";
-import { PrismaClient } from ".prisma/client";
+import { PrismaClient, User } from ".prisma/client";
 import { getUserFromToken } from "./util/getUserFromToken";
 
 const { prisma } = context;
 
 dotenv.config();
 
-interface IContextUser {
-  email: string;
-  password: string;
-}
 export type ApolloServerContext = Context<{
   prisma: PrismaClient;
-  user?: IContextUser;
+  user?: User;
 }>;
 
 const PORT = process.env.PORT || 5000;
@@ -42,7 +38,17 @@ async function startServer(typeDefs: any, resolvers: any) {
       // put the token info in the context for future use in resolvers
       const token = req.headers.authorization || "";
       const user = await getUserFromToken(token);
-      return { prisma, user };
+
+      if (!user) return { prisma, user };
+
+      const userFromDB = await prisma.user.findUnique({
+        where: { id: user.id },
+      });
+
+      if (!userFromDB)
+        throw new Error("You have to be authenticated to see this page");
+
+      return { prisma, user: userFromDB };
     },
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });

@@ -1,2 +1,2 @@
-export * from "./getAllJobs";
-export * from "./getJob";
+export * from "./get-all-jobs";
+export * from "./get-job";

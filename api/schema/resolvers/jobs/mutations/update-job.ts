@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-errors";
 
 import { Job } from ".prisma/client";
 import { ApolloServerContext } from "../../../../server";
@@ -9,7 +10,12 @@ export default async (
   context: ApolloServerContext
 ) => {
   try {
-    const { prisma } = context;
+    const { prisma, user } = context;
+
+    if (!user)
+      throw new AuthenticationError(
+        "You have to be authenticated to see this page"
+      );
     const { id, job } = args;
 
     // confirm that the job exists;

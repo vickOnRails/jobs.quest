@@ -29,11 +29,12 @@ export default async (
 
     const token = await jwt.sign(
       {
-        userId: userToReturn?.id,
+        // FIXME: chnage to id
+        id: userToReturn?.id,
         email: userToReturn?.email,
       },
       process.env.TOKEN_KEY as string,
-      { expiresIn: "30d" }
+      { expiresIn: "1d" }
     );
 
     return { ...userToReturn, token };
