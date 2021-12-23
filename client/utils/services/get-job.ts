@@ -31,6 +31,7 @@ const GET_JOB = gql`
       notes {
         id
         body
+        createdAt
       }
     }
   }

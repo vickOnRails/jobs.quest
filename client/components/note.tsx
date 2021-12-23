@@ -29,6 +29,8 @@ const Note: FC<{
 
   // use normal react state instead of formik
   const [noteContent, setNoteContent] = useState(initialNote);
+  const [noteContentHolder, setNoteContentHolder] = useState(initialNote.body);
+
   const {
     mutate: editNoteMutation,
     isLoading,
@@ -43,6 +45,8 @@ const Note: FC<{
         body: noteContent.body,
       });
 
+      await refetchJob();
+
       toast({
         title: `Note edited`,
         status: "success",
@@ -50,7 +54,8 @@ const Note: FC<{
         isClosable: true,
       });
 
-      setNoteContent({ id, body });
+      setNoteContent({ id, body, createdAt: initialNote.createdAt });
+      setNoteContentHolder(body);
       setEditing(false);
       // find the exact note
       // replace the body
@@ -124,7 +129,18 @@ const Note: FC<{
             >
               Save
             </Button>
-            <Button size="sm" onClick={() => setEditing(false)} type="button">
+            <Button
+              size="sm"
+              onClick={() => {
+                setNoteContent({
+                  body: noteContentHolder,
+                  id: initialNote.id,
+                  createdAt: initialNote.createdAt,
+                });
+                setEditing(false);
+              }}
+              type="button"
+            >
               Cancel
             </Button>
           </ButtonGroup>
@@ -132,6 +148,11 @@ const Note: FC<{
       ) : (
         <>
           <Text>{noteContent.body}</Text>
+          {noteContent.createdAt && (
+            <Text fontSize="sm" color="GrayText">
+              {new Date(noteContent.createdAt).toISOString().split("T")[0]}
+            </Text>
+          )}
           <ButtonGroup className="btn-group">
             <Button
               onClick={() => setEditing(true)}
@@ -165,6 +186,7 @@ const Note: FC<{
 interface Note {
   body: string;
   id: string;
+  createdAt?: string;
 }
 
 export const NotesContainer: FC<{
@@ -192,13 +214,13 @@ export const NotesContainer: FC<{
         body: newNoteValue,
       };
       const {
-        createNote: { body, id },
+        createNote: { body, id, createdAt },
       } = await createJobNote({ note, jobId: jobId?.jobId });
 
       await refetchJob();
       setNewNoteValue("");
 
-      notes && setNotes([{ body, id }, ...notes]);
+      notes && setNotes([{ body, id, createdAt }, ...notes]);
       setNewNoteMode(false);
 
       toast({

@@ -19,6 +19,7 @@ const CREATE_JOB_NOTE = gql`
     createNote(note: $note, jobId: $jobId) {
       id
       body
+      createdAt
     }
   }
 `;
@@ -27,6 +28,7 @@ interface NewNoteResponse extends Response {
   createNote: {
     id: string;
     body: string;
+    createdAt: string;
   };
 }
 
