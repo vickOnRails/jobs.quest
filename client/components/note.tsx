@@ -16,12 +16,14 @@ import { useMutation } from "react-query";
 import { deleteJobNote } from "../utils/services/delete-job-note";
 import { createJobNote } from "../utils/services/create-job-note";
 import { JobInfoProp } from "../pages/app";
+import { editJobNote } from "../utils/services/edit-job-note";
 
 const Note: FC<{
   note: Note;
   onDelete: (id: string) => void;
   refetchJob: () => void;
-}> = ({ note: initialNote, onDelete, refetchJob }) => {
+  idx: number;
+}> = ({ note: initialNote, onDelete, refetchJob, idx }) => {
   const [editing, setEditing] = useState(false);
   const toast = useToast();
 
@@ -33,6 +35,37 @@ const Note: FC<{
     error,
   } = useMutation(async (evt: FormEvent) => {
     evt.preventDefault();
+
+    try {
+      const {
+        updateNote: { id, body },
+      } = await editJobNote(noteContent?.id, {
+        body: noteContent.body,
+      });
+
+      toast({
+        title: `Note edited`,
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+
+      setNoteContent({ id, body });
+      setEditing(false);
+      // find the exact note
+      // replace the body
+    } catch (err) {
+      if (err instanceof Error)
+        toast({
+          title: "An error occurred",
+          status: "error",
+          // @ts-ignore
+          description: err.response && err.response.errors[0].message,
+          duration: 5000,
+          position: "top",
+          isClosable: true,
+        });
+    }
   });
 
   const {
@@ -72,61 +105,59 @@ const Note: FC<{
 
   return (
     <StyledNote borderRadius="md" mb="3" boxShadow="sm">
-      <form onSubmit={editNoteMutation}>
-        {editing ? (
-          <>
-            <Textarea
-              mb="3"
-              rows={5}
-              defaultValue={noteContent.body}
-              onChange={(e) =>
-                setNoteContent({ ...initialNote, body: e.target.value })
-              }
-            />
-            <ButtonGroup spacing="3" mb="3">
-              <Button
-                size="sm"
-                colorScheme="green"
-                type="submit"
-                isLoading={isLoading}
-              >
-                Save
-              </Button>
-              <Button size="sm" onClick={() => setEditing(false)}>
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </>
-        ) : (
-          <>
-            <Text>{noteContent.body}</Text>
-            <ButtonGroup className="btn-group">
-              <Button
-                onClick={() => setEditing(true)}
-                className="edit"
-                size="sm"
-                variant="outline"
-                bg="white"
-                shadow="md"
-              >
-                <Edit3 className="edit-icon" size="15" />
-              </Button>
-              <Button
-                onClick={() => deleteNote()}
-                className="delete"
-                size="sm"
-                variant="outline"
-                colorScheme="red"
-                isLoading={isNoteDeleting}
-                bg="white"
-                shadow="md"
-              >
-                <Trash2 className="delete-icon" size="15" />
-              </Button>
-            </ButtonGroup>
-          </>
-        )}
-      </form>
+      {editing ? (
+        <form onSubmit={editNoteMutation}>
+          <Textarea
+            mb="3"
+            rows={5}
+            defaultValue={noteContent.body}
+            onChange={(e) =>
+              setNoteContent({ ...initialNote, body: e.target.value })
+            }
+          />
+          <ButtonGroup spacing="3" mb="3">
+            <Button
+              size="sm"
+              colorScheme="green"
+              type="submit"
+              isLoading={isLoading}
+            >
+              Save
+            </Button>
+            <Button size="sm" onClick={() => setEditing(false)} type="button">
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </form>
+      ) : (
+        <>
+          <Text>{noteContent.body}</Text>
+          <ButtonGroup className="btn-group">
+            <Button
+              onClick={() => setEditing(true)}
+              className="edit"
+              size="sm"
+              variant="outline"
+              bg="white"
+              shadow="md"
+            >
+              <Edit3 className="edit-icon" size="15" />
+            </Button>
+            <Button
+              onClick={() => deleteNote()}
+              className="delete"
+              size="sm"
+              variant="outline"
+              colorScheme="red"
+              isLoading={isNoteDeleting}
+              bg="white"
+              shadow="md"
+            >
+              <Trash2 className="delete-icon" size="15" />
+            </Button>
+          </ButtonGroup>
+        </>
+      )}
     </StyledNote>
   );
 };
@@ -243,10 +274,11 @@ export const NotesContainer: FC<{
 
       {/* show notes, only if job has notes */}
       {notes && notes.length > 0
-        ? notes.map((note) => (
+        ? notes.map((note, idx) => (
             <Note
               note={note}
               key={note.id}
+              idx={idx}
               onDelete={onDelete}
               refetchJob={refetchJob}
             />

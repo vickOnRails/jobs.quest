@@ -19,6 +19,8 @@ export default async (
 
     const { id, note } = args;
 
+    console.log({ id, note });
+
     // confirm that the job exists;
     const updatedNote = await prisma.note.update({
       where: { id },
